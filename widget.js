@@ -1,13 +1,18 @@
-// Subscribe to the "ready" event to know when the widget is loaded
+// Wait until the widget is ready
 JFCustomWidget.subscribe("ready", function () {
-    console.log("Widget is ready!");
+    console.log("Widget SDK is ready!");
 
-    // Notify the JotForm form that the widget is initialized
+    // Notify JotForm that the widget is initialized
     JFCustomWidget.sendData({ initialized: true });
 
-    // Auto-submit the form after a delay
+    // Set a timeout to auto-submit the form
     setTimeout(() => {
-        console.log("Auto-submitting the form...");
-        JFCustomWidget.sendSubmit();
-    }, 3000); // Adjust the delay (in milliseconds) as needed (3 seconds in this example)
+        console.log("Attempting to auto-submit the form...");
+        try {
+            JFCustomWidget.sendSubmit();
+            console.log("Form submission triggered successfully!");
+        } catch (error) {
+            console.error("Error while triggering form submission:", error);
+        }
+    }, 3000); // Adjust delay as needed (3 seconds here)
 });
