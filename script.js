@@ -1,26 +1,35 @@
 JFCustomWidget.subscribe("ready", function () {
     // Get the widget settings
     const settings = JFCustomWidget.getWidgetSettings();
-    
-    // Extract the form ID from the widget settings
+
+    // Extract formId and questionId from settings
     const formId = settings.formId || "Unknown Form ID";
-    const formFields = settings.fields || {}; // Extract form fields from settings
+    const qid = settings.qid || "Unknown Question ID";
 
-    // Log the form ID for debugging
     console.log("Form ID:", formId);
+    console.log("Question ID:", qid);
 
-    // Check if form fields are available
-    if (!formFields || Object.keys(formFields).length === 0) {
-        console.error("No fields found in the widget settings. Ensure the widget is properly configured.");
-        return;
-    }
-
-    // Log fields and their values after a 2-second delay
+    // Attempt to fetch the fields dynamically
     setTimeout(() => {
-        console.log("Form Fields and Values:");
-        Object.keys(formFields).forEach((key) => {
-            const field = formFields[key];
-            console.log(`Field ID: ${key}, Label: ${field.label}, Value: ${field.value || "Not Filled"}`);
-        });
+        try {
+            // Fetch fields dynamically from Jotform's API
+            JFCustomWidget.getFieldsValue([], "id", (fields) => {
+                console.log("Fetched Fields:", fields);
+
+                if (fields && Object.keys(fields).length > 0) {
+                    console.log("Form Fields and Responses:");
+                    Object.keys(fields).forEach((key) => {
+                        const field = fields[key];
+                        console.log(
+                            `Field ID: ${key}, Label: ${field.label || "No Label"}, Value: ${field.value || "Not Filled"}`
+                        );
+                    });
+                } else {
+                    console.warn("No fields found or responses are empty.");
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching fields and responses:", error);
+        }
     }, 2000);
 });
