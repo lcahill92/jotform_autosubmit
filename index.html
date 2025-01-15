@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit After 2 Seconds</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://js.jotform.com/JotFormCustomWidget.js"></script> <!-- Required for JotForm widgets -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="message-container">
-        <p>Waiting for 2 seconds to submit...</p>
-    </div>
+    <title>Countdown Widget</title>
 
-    <script src="script.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="min/styles.min.css">
+
+    <!-- JotForm Widget Framework -->
+    <script src="https://cdn.jotform.ms/s/umd/latest/for-custom-widgets.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+    <!-- Custom Scripts -->
+    <script src="min/scripts.min.js"></script>
+</head>
+
+<body>
+    <div id="countdown">
+        <p>Submitting in 2 seconds...</p>
+    </div>
 </body>
+
 </html>
