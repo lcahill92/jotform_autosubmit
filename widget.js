@@ -38,57 +38,60 @@
     });
 
     async function submitForm(apiKey, formId) {
-        console.log("Submitting the form...");
+    console.log("Submitting the form...");
 
-        try {
-            window.parent.postMessage({ type: "getAllValues" }, "*");
+    try {
+        // Request all field values from the parent form
+        window.parent.postMessage({ type: "getAllValues" }, "*");
 
-            window.addEventListener("message", async (event) => {
-                console.log("Event Received:", event);
+        // Listen for form values from JotForm
+        window.addEventListener("message", async (event) => {
+            console.log("Event Received:", event);
 
-                if (event.data.type === "allValues") {
-                    const formData = event.data.values;
-                    console.log("Form Data to be submitted:", formData);
+            if (event.data.type === "allValues") {
+                const formData = event.data.values;
+                console.log("Form Data to be submitted:", formData);
 
-                    if (!formData || Object.keys(formData).length === 0) {
-                        console.error("Form Data is empty. Cannot submit.");
-                        return;
-                    }
-
-                    const formattedData = {}; // Prepare data with correct field IDs
-                    for (const key in formData) {
-                        formattedData[`q_${key}`] = formData[key]; // Map to JotForm field IDs
-                    }
-                    console.log("Formatted Data:", formattedData);
-
-                    const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
-                    console.log("API Request URL:", apiUrl);
-
-                    const response = await fetch(apiUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            submission: formattedData,
-                        }),
-                    });
-
-                    const result = await response.json();
-                    console.log("API Response:", result);
-
-                    if (!response.ok || !result.success) {
-                        console.error("Submission failed:", result.message || "Unknown error");
-                        return;
-                    }
-
-                    console.log("Submission successful:", result);
-
-                    window.parent.postMessage({ type: "submissionSuccess" }, "*");
+                if (!formData || Object.keys(formData).length === 0) {
+                    console.error("Form Data is empty. Cannot submit.");
+                    return;
                 }
-            });
-        } catch (error) {
-            console.error("Error submitting the form:", error);
-        }
+
+                // Format data to match expected field IDs
+                const formattedData = {};
+                for (const key in formData) {
+                    formattedData[`q_${key}`] = formData[key]; // Adjust mapping as needed
+                }
+                console.log("Formatted Data:", formattedData);
+
+                const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
+                console.log("API Request URL:", apiUrl);
+
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        submission: formattedData,
+                    }),
+                });
+
+                const result = await response.json();
+                console.log("API Response:", result);
+
+                if (!response.ok || !result.success) {
+                    console.error("Submission failed:", result.message || "Unknown error");
+                    return;
+                }
+
+                console.log("Submission successful:", result);
+
+                window.parent.postMessage({ type: "submissionSuccess" }, "*");
+            }
+        });
+    } catch (error) {
+        console.error("Error submitting the form:", error);
     }
+}
 })();
