@@ -24,17 +24,15 @@
       if (countdown <= 0) {
         clearInterval(countdownInterval);
 
-        // Attempt to find and submit the form
+        // Send a message to the parent window to submit the form
         try {
-          const formElement = window.parent.document.getElementById("250137186711049");
-          if (formElement) {
-            console.log("Form found. Submitting...");
-            formElement.submit(); // Submit the form
-          } else {
-            console.error("Form not found in the parent DOM.");
-          }
+          window.parent.postMessage(
+            { action: "submitForm" }, // Message payload
+            "*" // Allow all origins for now
+          );
+          console.log("Message sent to parent to submit the form.");
         } catch (error) {
-          console.error("Error accessing parent form:", error);
+          console.error("Error sending message to parent:", error);
         }
       }
     }, 1000);
