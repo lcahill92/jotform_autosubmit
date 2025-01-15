@@ -1,19 +1,22 @@
-/* Styling for the countdown widget */
-#countdown-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
-#countdown {
-    font-size: 30px;
-    color: #333;
-    text-align: center;
-    border: 2px solid #000;
-    border-radius: 8px;
+#widget-container {
+    margin: 50px auto;
     padding: 20px;
     background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+#status {
+    font-size: 18px;
+    color: #333;
 }
