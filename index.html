@@ -24,9 +24,9 @@
       if (countdown <= 0) {
         clearInterval(countdownInterval);
 
-        // Attempt to find the parent form in the main document
+        // Attempt to find and submit the form
         try {
-          const formElement = window.parent.document.querySelector("#250137186711049");
+          const formElement = window.parent.document.getElementById("250137186711049");
           if (formElement) {
             console.log("Form found. Submitting...");
             formElement.submit(); // Submit the form
