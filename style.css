@@ -9,19 +9,10 @@ body {
     padding: 20px;
 }
 
-#form-data {
-    margin: 20px 0;
+h1 {
+    color: #007BFF;
 }
 
-button {
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
+p {
+    color: #555;
 }

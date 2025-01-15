@@ -1,0 +1,13 @@
+{
+    "name": "custom_widget",
+    "title": "Custom Widget",
+    "description": "A custom widget for Jotform forms",
+    "version": "1.0",
+    "icon": "https://example.com/icon.png",
+    "iframe": {
+        "src": "https://your-github-pages-url/index.html",
+        "width": 400,
+        "height": 300
+    },
+    "sandbox": true
+}

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const formDataContainer = document.getElementById('form-data');
-    const submitButton = document.getElementById('submit-btn');
+    const statusText = document.getElementById('status');
 
     // Initialize the widget
     JFCustomWidget.subscribe('ready', () => {
@@ -9,24 +8,35 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fetch form fields
         const formFields = JFCustomWidget.getWidgetSettings().formFields;
 
-        // Display form responses in the widget
+        // Fetch responses for the form fields
         JFCustomWidget.getFieldsValueById(Object.keys(formFields), (responses) => {
             console.log('Form Responses:', responses);
 
-            // Display the form data in the widget
-            formDataContainer.innerHTML = `<pre>${JSON.stringify(responses, null, 2)}</pre>`;
-        });
+            // Process the responses
+            const processedData = processFormData(responses);
 
-        // Handle submit button click
-        submitButton.addEventListener('click', () => {
-            // Process custom widget value
-            const customValue = `Custom Data: ${Date.now()}`; // Example custom value
-
-            // Submit data back to the form
+            // Automatically submit the processed data
             JFCustomWidget.sendSubmit({
                 valid: true,
-                value: customValue,
+                value: JSON.stringify(processedData), // Example: Submitting processed data as a JSON string
             });
+
+            // Update the status
+            statusText.textContent = "Submission successful. Redirecting...";
         });
     });
+
+    /**
+     * Process form data as needed (e.g., filter, transform, or aggregate)
+     * @param {Object} formData
+     * @returns {Object} Processed data
+     */
+    function processFormData(formData) {
+        // Example: Add a timestamp and format responses
+        return {
+            ...formData,
+            timestamp: new Date().toISOString(),
+            processed: true,
+        };
+    }
 });
