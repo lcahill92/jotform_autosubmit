@@ -1,34 +1,47 @@
 (function () {
-    // Default timer duration (fallback if not provided in settings)
-    const defaultCountdownTime = 10;
+    const countdownTime = 2; // Timer duration in seconds
+    let timeRemaining = countdownTime;
+  
+    // Function to extract Form ID from the parent URL
+    function getFormIdFromUrl() {
+      try {
+        const parentUrl = document.referrer; // Parent form URL
+        console.log("Parent URL:", parentUrl);
+  
+        // Extract the form ID from the URL path
+        const url = new URL(parentUrl);
+        const formId = url.pathname.split("/").pop(); // Get the last part of the path
+        return formId || null;
+      } catch (error) {
+        console.error("Error extracting Form ID from parent URL:", error);
+        return null;
+      }
+    }
   
     // Wait for the widget to be ready
     JFCustomWidget.subscribe("ready", async () => {
       console.log("Widget is ready.");
   
-      // Get widget settings (includes timer duration and other configurations)
+      // Get widget settings
       const widgetSettings = JFCustomWidget.getWidgetSettings();
       console.log("Widget Settings:", widgetSettings);
   
-      // Retrieve the timer duration from settings, or use the default
-      const timerDuration = parseInt(widgetSettings.timerDuration, 10) || defaultCountdownTime;
-      console.log("Timer Duration:", timerDuration);
-  
-      // Retrieve API key and form ID
+      // Retrieve API key and Form ID
       const apiKey = widgetSettings.apiKey; // API key passed via widget settings
       let formId = widgetSettings.formId || widgetSettings.refFormID;
-  
       if (!formId) {
         formId = getFormIdFromUrl();
       }
-      console.log("Form ID:", formId);
   
-      if (!formId || !apiKey) {
-        console.error("Form ID or API Key is missing!");
+      console.log("Form ID:", formId);
+      console.log("API Key:", apiKey);
+  
+      if (!formId) {
+        console.error("Form ID could not be determined!");
         return;
       }
   
-      // Ensure the timer element exists before proceeding
+      // Ensure the timer element exists
       const timerElement = document.getElementById("timer");
       if (!timerElement) {
         console.error("Timer element not found in the DOM.");
@@ -36,7 +49,6 @@
       }
   
       // Initialize the timer
-      let timeRemaining = timerDuration;
       timerElement.textContent = timeRemaining;
   
       // Start the countdown
@@ -50,12 +62,6 @@
         }
       }, 1000); // Decrement every second
     });
-  
-    // Function to extract Form ID from URL
-    function getFormIdFromUrl() {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get("formID");
-    }
   
     // Submit the form via JotForm API
     async function submitForm(apiKey, formId) {
