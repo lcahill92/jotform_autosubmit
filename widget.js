@@ -58,11 +58,10 @@
                     const formData = event.data.values;
 
                     // Submit the form data via JotForm API
-                    const response = await fetch(`https://api.jotform.com/form/${formId}/submissions`, {
+                    const response = await fetch(`https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json",
-                            APIKEY: apiKey,
+                            "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
                             submission: formData,
