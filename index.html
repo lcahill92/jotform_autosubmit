@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- Load JotForm's Custom Widget SDK -->
         <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
     </head>
     <body>
         <div id="widget-container">
-            <h3>The form will auto-submit shortly, this is a test...</h3>
+            <h3>The form will auto-submit shortly...</h3>
         </div>
         <script type="text/javascript">
-            // Subscribe to the "ready" event
+            // Subscribe to the "ready" event to initialize the widget
             JFCustomWidget.subscribe("ready", function () {
-                console.log("Widget initialized!");
+                console.log("Widget SDK initialized.");
 
                 // Notify JotForm that the widget is initialized
                 JFCustomWidget.sendData({ initialized: true });
+                console.log("Initialization data sent to JotForm.");
 
-                // Trigger auto-submit after a delay
+                // Auto-submit the form after a short delay
                 setTimeout(function () {
-                    console.log("Sending form submission...");
-                    JFCustomWidget.sendSubmit({
-                        valid: true, // Indicates validation passed
-                        value: "Auto-submitted by the widget" // Placeholder value
-                    });
-                }, 3000); // Auto-submit after 3 seconds
+                    console.log("Attempting to auto-submit the form...");
+                    try {
+                        JFCustomWidget.sendSubmit({
+                            valid: true, // Indicates the form is valid
+                            value: "Auto-submitted value" // Placeholder value
+                        });
+                        console.log("Form submission triggered successfully.");
+                    } catch (error) {
+                        console.error("Error during form submission:", error);
+                    }
+                }, 3000); // Delay in milliseconds
+            });
+
+            // Log any subscription errors
+            JFCustomWidget.subscribe("error", function (error) {
+                console.error("Widget SDK error:", error);
             });
         </script>
     </body>
