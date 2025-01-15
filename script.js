@@ -1,5 +1,5 @@
 JFCustomWidget.subscribe("ready", function () {
-    console.log("Widget is ready!");
+    console.log("Widget is ready!"); 
 
     // Fetch widget settings
     const settings = JFCustomWidget.getWidgetSettings();
@@ -29,7 +29,7 @@ JFCustomWidget.subscribe("ready", function () {
                 console.warn("No fields found in the form.");
             }
         })
-        .catch((error) => {
+        .catch((error) => { 
             console.error("Error fetching fields:", error);
         });
 });
