@@ -2,7 +2,7 @@
     console.log("Widget script loaded.");
 
     // Countdown timer configuration
-    const countdownTime = 5; // Countdown duration in seconds
+    const countdownTime = 2; // Countdown duration in seconds
     let timeRemaining = countdownTime;
 
     // Ensure the form exists
