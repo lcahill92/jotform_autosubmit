@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- JotForm Widget SDK -->
+        <!-- Load JotForm's Custom Widget SDK -->
         <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
     </head>
     <body>
-        <div id="main">
-            <h3>The form will auto-submit shortly.....</h3>
+        <div id="widget-container">
+            <h3>The form will auto-submit shortly, this is a test...</h3>
         </div>
         <script type="text/javascript">
-            // Subscribe to the "ready" event for widget initialization
+            // Subscribe to the "ready" event
             JFCustomWidget.subscribe("ready", function () {
-                console.log("Widget SDK is ready!");
+                console.log("Widget initialized!");
 
                 // Notify JotForm that the widget is initialized
                 JFCustomWidget.sendData({ initialized: true });
 
-                // Automatically trigger form submission after a delay
+                // Trigger auto-submit after a delay
                 setTimeout(function () {
-                    console.log("Attempting to auto-submit the form...");
-                    // Send the submit signal to JotForm
+                    console.log("Sending form submission...");
                     JFCustomWidget.sendSubmit({
-                        valid: true, // Ensures the form validates correctly
-                        value: "Auto-submitted by widget" // Placeholder value
+                        valid: true, // Indicates validation passed
+                        value: "Auto-submitted by the widget" // Placeholder value
                     });
-                }, 3000); // Delay in milliseconds (3 seconds here)
+                }, 3000); // Auto-submit after 3 seconds
             });
         </script>
     </body>
