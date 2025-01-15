@@ -14,7 +14,7 @@
       // Get widget settings (includes API key and other configurations)
       const widgetSettings = JFCustomWidget.getWidgetSettings();
   
-      const apiKey = widgetSettings.apiKey; // API key passed via widget settings
+      const apiKey = "03700e066d92a4e8a50476dcf7a1a3fc"; // API key passed via widget settings
       const formId = widgetSettings.formId || widgetSettings.refFormID; // Dynamic form ID
   
       console.log("Form ID:", formId);
