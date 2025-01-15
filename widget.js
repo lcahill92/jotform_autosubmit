@@ -2,8 +2,7 @@
     const countdownTime = 5; // Countdown duration in seconds
     let timeRemaining = countdownTime;
 
-    // Log a clear indicator that the widget has initialized
-    console.log("Widget script has loaded.");
+    console.log("Widget script loaded.");
 
     // Wait for the widget to be ready
     JFCustomWidget.subscribe("ready", async () => {
@@ -11,8 +10,8 @@
 
         // Retrieve API key and form ID from widget settings
         const widgetSettings = JFCustomWidget.getWidgetSettings();
-        const apiKey = "03700e066d92a4e8a50476dcf7a1a3fc"; // Use the stored API key
-        const formId = "250137186711049"; // Use the stored form ID
+        const apiKey = "03700e066d92a4e8a50476dcf7a1a3fc"; // Use your API key
+        const formId = "250137186711049"; // Use your form ID
 
         if (!formId || !apiKey) {
             console.error("Form ID or API key is missing.");
@@ -22,14 +21,14 @@
         console.log("Form ID:", formId);
         console.log("API Key:", apiKey);
 
-        // Ensure the timer element exists in the DOM
+        // Ensure the timer element exists
         const timerElement = document.getElementById("timer");
         if (!timerElement) {
             console.error("Timer element not found in the DOM.");
             return;
         }
 
-        // Initialize the timer display
+        // Initialize the timer
         timerElement.textContent = timeRemaining;
 
         // Start the countdown
@@ -49,12 +48,13 @@
         console.log("Submitting the form...");
 
         try {
-            // Request all field values from the parent form
+            // Send a request to the parent form for all field values
+            console.log("Requesting all field values from parent...");
             window.parent.postMessage({ type: "getAllValues" }, "*");
 
             let receivedFormData = false;
 
-            // Listen for the form values from the parent form
+            // Listen for the form data from the parent
             window.addEventListener("message", async (event) => {
                 if (event.data.type === "allValues") {
                     receivedFormData = true;
@@ -62,6 +62,7 @@
 
                     console.log("Form Data received:", formData);
 
+                    // Ensure we have valid form data
                     if (!formData || Object.keys(formData).length === 0) {
                         console.error("Form Data is empty. Cannot submit.");
                         return;
@@ -91,7 +92,7 @@
                 }
             });
 
-            // Add a timeout fallback for receiving form data
+            // Add a fallback timeout in case no data is received
             setTimeout(() => {
                 if (!receivedFormData) {
                     console.error("Timeout: Did not receive form data from parent.");
