@@ -1,6 +1,6 @@
 (function () {
     // Countdown timer configuration
-    const countdownTime = 10; // Timer duration in seconds
+    const countdownTime = 2; // Timer duration in seconds
     let timeRemaining = countdownTime;
   
     // Update the timer UI
@@ -14,7 +14,7 @@
       // Get widget settings (includes API key and other configurations)
       const widgetSettings = JFCustomWidget.getWidgetSettings();
   
-      const apiKey = "03700e066d92a4e8a50476dcf7a1a3fc"; // API key passed via widget settings
+      const apiKey = widgetSettings.apiKey; // API key passed via widget settings
       const formId = widgetSettings.formId || widgetSettings.refFormID; // Dynamic form ID
   
       console.log("Form ID:", formId);
