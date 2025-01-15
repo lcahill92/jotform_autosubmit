@@ -15,5 +15,5 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             console.error("Error submitting the form:", error);
         }
-    }, 2000); // 2-second delay
+    }, 2000); // 2-second delay 
 });
