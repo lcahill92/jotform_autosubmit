@@ -1,50 +1,31 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Auto Submit Widget</title>
-        <!-- Load JotForm's Custom Widget SDK -->
         <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
     </head>
     <body>
-        <div id="widget-container">
-            <h3>The form will auto-submit shortly....</h3>
+        <div id="main">
+            <h3>This is my first widget.</h3>
+            <span id="labelText"></span>
+            <input type="text" id="userInput">
         </div>
         <script type="text/javascript">
-            // Subscribe to the "ready" event to initialize the widget
-            JFCustomWidget.subscribe("ready", function () {
-    console.log("Widget SDK is initialized.");
-
-    // Notify JotForm that the widget is initialized
-    JFCustomWidget.sendData({ initialized: true });
-    console.log("Initialization data sent to JotForm.");
-
-    // Attempt auto-submit after a delay
-    setTimeout(function () {
-        console.log("Attempting to auto-submit the form...");
-        try {
-            const submissionData = {
-                valid: true, // Mark the widget as valid
-                value: "a" // Placeholder value
-            };
-            console.log("Sending submission data:", submissionData);
-
-            // Trigger form submission
-            JFCustomWidget.sendData(submissionData);
-            console.log("Form submission sent successfully.");
-        } catch (error) {
-            console.error("Error during submission:", error);
-        }
-    }, 3000); // Delay: 3 seconds
-});
-
-            // Log any subscription errors for debugging
-            JFCustomWidget.subscribe("error", function (error) {
-                console.error("Widget SDK error:", error);
-            });
-
-            // Confirm submission acknowledgment from JotForm
-            JFCustomWidget.subscribe("submitAcknowledged", function () {
-                console.log("Form submission acknowledged by JotForm.");
+            //always subscribe to ready event and implement widget related code
+            //inside callback function , it is the best practice while developing widgets
+            JFCustomWidget.subscribe("ready", function(){
+                var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
+                document.getElementById('labelText').innerHTML = label;
+                //subscribe to form submit event
+                JFCustomWidget.subscribe("submit", function(){
+                    var msg = {
+                        //you should valid attribute to data for JotForm
+                        //to be able to use youw widget as required
+                        valid: true,
+                        value: document.getElementById('userInput').value
+                    }
+                    // send value to JotForm
+                    JFCustomWidget.sendSubmit(msg);
+                });
             });
         </script>
     </body>
