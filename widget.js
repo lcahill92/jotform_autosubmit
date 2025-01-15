@@ -2,92 +2,103 @@
     const countdownTime = 5; // Countdown duration in seconds
     let timeRemaining = countdownTime;
 
-    const JFCustomWidget = {
-        init() {
-            // Subscribe to the ready event
-            this.subscribe("ready", this.onReady);
-        },
-        subscribe(event, handler) {
-            window.addEventListener("message", (e) => {
-                if (e.data.type === event) {
-                    handler(e.data);
-                }
-            });
-        },
-        sendMessage(data) {
-            window.parent.postMessage(data, "*");
-        },
-        onReady() {
-            console.log("Widget is ready.");
-            const timerElement = document.getElementById("timer");
-            if (!timerElement) {
-                console.error("Timer element not found.");
-                return;
-            }
+    // Log a clear indicator that the widget has initialized
+    console.log("Widget script has loaded.");
 
+    // Wait for the widget to be ready
+    JFCustomWidget.subscribe("ready", async () => {
+        console.log("Widget is ready.");
+
+        // Retrieve API key and form ID from widget settings
+        const widgetSettings = JFCustomWidget.getWidgetSettings();
+        const apiKey = "03700e066d92a4e8a50476dcf7a1a3fc"; // Use the stored API key
+        const formId = "250137186711049"; // Use the stored form ID
+
+        if (!formId || !apiKey) {
+            console.error("Form ID or API key is missing.");
+            return;
+        }
+
+        console.log("Form ID:", formId);
+        console.log("API Key:", apiKey);
+
+        // Ensure the timer element exists in the DOM
+        const timerElement = document.getElementById("timer");
+        if (!timerElement) {
+            console.error("Timer element not found in the DOM.");
+            return;
+        }
+
+        // Initialize the timer display
+        timerElement.textContent = timeRemaining;
+
+        // Start the countdown
+        const countdownInterval = setInterval(() => {
+            timeRemaining -= 1;
             timerElement.textContent = timeRemaining;
-            const countdownInterval = setInterval(() => {
-                timeRemaining--;
-                timerElement.textContent = timeRemaining;
 
-                if (timeRemaining <= 0) {
-                    clearInterval(countdownInterval);
-                    JFCustomWidget.submitForm();
-                }
-            }, 1000);
-        },
-        async submitForm() {
-            console.log("Submitting form...");
-            this.sendMessage({ type: "getAllValues" });
+            if (timeRemaining <= 0) {
+                clearInterval(countdownInterval);
+                submitForm(apiKey, formId);
+            }
+        }, 1000); // Decrement every second
+    });
 
-            const timeout = setTimeout(() => {
-                console.error("Timeout: Did not receive form data.");
-            }, 5000);
+    // Function to submit the form via JotForm API
+    async function submitForm(apiKey, formId) {
+        console.log("Submitting the form...");
 
+        try {
+            // Request all field values from the parent form
+            window.parent.postMessage({ type: "getAllValues" }, "*");
+
+            let receivedFormData = false;
+
+            // Listen for the form values from the parent form
             window.addEventListener("message", async (event) => {
                 if (event.data.type === "allValues") {
-                    clearTimeout(timeout);
+                    receivedFormData = true;
                     const formData = event.data.values;
 
+                    console.log("Form Data received:", formData);
+
                     if (!formData || Object.keys(formData).length === 0) {
-                        console.error("Received empty form data.");
+                        console.error("Form Data is empty. Cannot submit.");
                         return;
                     }
 
-                    console.log("Form Data Received:", formData);
-                    await this.sendSubmission(formData);
+                    // Submit the form data via JotForm API
+                    const response = await fetch(
+                        `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                submission: formData,
+                            }),
+                        }
+                    );
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        console.log("Submission successful:", result);
+                        window.parent.postMessage({ type: "submissionSuccess" }, "*");
+                    } else {
+                        console.error("Error in submission:", result);
+                    }
                 }
             });
-        },
-        async sendSubmission(formData) {
-            const formId = "250137186711049"; // Replace with dynamic form ID
-            const apiKey = "03700e066d92a4e8a50476dcf7a1a3fc"; // Replace with dynamic API Key
-            const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        submission: formData,
-                    }),
-                });
-
-                const result = await response.json();
-                if (response.ok && result.success) {
-                    console.log("Submission successful:", result);
-                    this.sendMessage({ type: "submissionSuccess" });
-                } else {
-                    console.error("Submission failed:", result.message || "Unknown error");
+            // Add a timeout fallback for receiving form data
+            setTimeout(() => {
+                if (!receivedFormData) {
+                    console.error("Timeout: Did not receive form data from parent.");
                 }
-            } catch (error) {
-                console.error("Error submitting form:", error);
-            }
-        },
-    };
-
-    // Initialize the widget
-    JFCustomWidget.init();
+            }, 5000);
+        } catch (error) {
+            console.error("Error during submission process:", error);
+        }
+    }
 })();
