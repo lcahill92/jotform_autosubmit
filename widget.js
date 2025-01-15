@@ -1,4 +1,4 @@
-(async function () {
+(function () {
     const countdownTime = 2; // Timer duration in seconds
     let timeRemaining = countdownTime;
 
@@ -6,9 +6,10 @@
     JFCustomWidget.subscribe("ready", async () => {
         console.log("Widget is ready.");
 
+        // Get widget settings
         const widgetSettings = JFCustomWidget.getWidgetSettings();
         const apiKey = widgetSettings.apiKey;
-        const formId = widgetSettings.formId; 
+        const formId = widgetSettings.formId;
 
         console.log("Form ID:", formId);
         console.log("API Key:", apiKey);
@@ -18,6 +19,7 @@
             return;
         }
 
+        // Ensure the timer element exists
         const timerElement = document.getElementById("timer");
         if (!timerElement) {
             console.error("Timer element not found.");
@@ -26,6 +28,7 @@
 
         timerElement.textContent = timeRemaining;
 
+        // Start the countdown
         const countdownInterval = setInterval(() => {
             timeRemaining -= 1;
             timerElement.textContent = timeRemaining;
@@ -37,61 +40,64 @@
         }, 1000);
     });
 
+    // Submit the form via JotForm API
     async function submitForm(apiKey, formId) {
-    console.log("Submitting the form...");
+        console.log("Submitting the form...");
 
-    try {
-        // Request all field values from the parent form
-        window.parent.postMessage({ type: "getAllValues" }, "*");
+        try {
+            // Request all field values from the parent form
+            console.log("Requesting all field values...");
+            window.parent.postMessage({ type: "getAllValues" }, "*");
 
-        // Listen for form values from JotForm
-        window.addEventListener("message", async (event) => {
-            console.log("Event Received:", event);
+            // Listen for form values from JotForm
+            window.addEventListener("message", async (event) => {
+                console.log("Event Received:", event);
 
-            if (event.data.type === "allValues") {
-                const formData = event.data.values;
-                console.log("Form Data to be submitted:", formData);
+                if (event.data.type === "allValues") {
+                    const formData = event.data.values;
+                    console.log("Form Data to be submitted:", formData);
 
-                if (!formData || Object.keys(formData).length === 0) {
-                    console.error("Form Data is empty. Cannot submit.");
-                    return;
+                    if (!formData || Object.keys(formData).length === 0) {
+                        console.error("Form Data is empty. Cannot submit.");
+                        return;
+                    }
+
+                    // Format data to match expected field IDs
+                    const formattedData = {};
+                    for (const key in formData) {
+                        formattedData[`q_${key}`] = formData[key]; // Adjust mapping as needed
+                    }
+                    console.log("Formatted Data:", formattedData);
+
+                    const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
+                    console.log("API Request URL:", apiUrl);
+
+                    const response = await fetch(apiUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            submission: formattedData,
+                        }),
+                    });
+
+                    const result = await response.json();
+                    console.log("API Response:", result);
+
+                    if (!response.ok || !result.success) {
+                        console.error("Submission failed:", result.message || "Unknown error");
+                        return;
+                    }
+
+                    console.log("Submission successful:", result);
+
+                    // Notify the parent form of submission success
+                    window.parent.postMessage({ type: "submissionSuccess" }, "*");
                 }
-
-                // Format data to match expected field IDs
-                const formattedData = {};
-                for (const key in formData) {
-                    formattedData[`q_${key}`] = formData[key]; // Adjust mapping as needed
-                }
-                console.log("Formatted Data:", formattedData);
-
-                const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
-                console.log("API Request URL:", apiUrl);
-
-                const response = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        submission: formattedData,
-                    }),
-                });
-
-                const result = await response.json();
-                console.log("API Response:", result);
-
-                if (!response.ok || !result.success) {
-                    console.error("Submission failed:", result.message || "Unknown error");
-                    return;
-                }
-
-                console.log("Submission successful:", result);
-
-                window.parent.postMessage({ type: "submissionSuccess" }, "*");
-            }
-        });
-    } catch (error) {
-        console.error("Error submitting the form:", error);
+            });
+        } catch (error) {
+            console.error("Error submitting the form:", error);
+        }
     }
-}
 })();
