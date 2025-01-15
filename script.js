@@ -1,42 +1,25 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const statusText = document.getElementById('status');
+JFCustomWidget.subscribe('ready', () => {
+    console.log('Widget is ready!');
 
-    // Initialize the widget
-    JFCustomWidget.subscribe('ready', () => {
-        console.log('Widget is ready!');
+    setTimeout(() => {
+        try {
+            // Get all the field IDs from the widget settings
+            const settings = JFCustomWidget.getWidgetSettings();
+            console.log('Widget settings:', settings);
 
-        // Fetch form fields
-        const formFields = JFCustomWidget.getWidgetSettings().formFields;
+            const formFields = settings.fields || {};
+            if (!formFields || Object.keys(formFields).length === 0) {
+                throw new Error('formFields is undefined or empty. Check widget configuration.');
+            }
 
-        // Fetch responses for the form fields
-        JFCustomWidget.getFieldsValueById(Object.keys(formFields), (responses) => {
-            console.log('Form Responses:', responses);
+            console.log('Form Fields:', formFields);
 
-            // Process the responses
-            const processedData = processFormData(responses);
-
-            // Automatically submit the processed data
-            JFCustomWidget.sendSubmit({
-                valid: true,
-                value: JSON.stringify(processedData), // Example: Submitting processed data as a JSON string
+            // Fetch field values by IDs
+            JFCustomWidget.getFieldsValueById(Object.keys(formFields), (responses) => {
+                console.log('Form Responses:', responses);
             });
-
-            // Update the status
-            statusText.textContent = "Submission successful. Redirecting...";
-        });
-    });
-
-    /**
-     * Process form data as needed (e.g., filter, transform, or aggregate)
-     * @param {Object} formData
-     * @returns {Object} Processed data
-     */
-    function processFormData(formData) {
-        // Example: Add a timestamp and format responses
-        return {
-            ...formData,
-            timestamp: new Date().toISOString(),
-            processed: true,
-        };
-    }
+        } catch (error) {
+            console.error('Error fetching fields and responses:', error);
+        }
+    }, 2000); // Delay of 2 seconds
 });

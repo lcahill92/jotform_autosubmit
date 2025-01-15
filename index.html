@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Jotform Widget</title>
+    <title>Custom JotForm Widget</title>
+
+    <!-- Add custom styles -->
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jotfor.ms/s/umd/latest/for-custom-widgets.js"></script>
+
+    <!-- JotForm Widget API -->
+    <script src="https://cdn.jotform.com/s/umd/latest/for-custom-widgets.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
+
 <body>
     <div id="widget-container">
-        <h1>Processing...</h1>
-        <p id="status">Please wait while we process the form.</p>
+        <p id="status">Initializing...</p>
     </div>
+
+    <!-- Add custom scripts -->
     <script src="script.js"></script>
 </body>
+
 </html>

@@ -1,18 +1,16 @@
+/* Center the widget content */
 body {
     font-family: Arial, sans-serif;
+    text-align: center;
     margin: 0;
     padding: 0;
-    text-align: center;
 }
 
 #widget-container {
-    padding: 20px;
+    margin-top: 50px;
 }
 
-h1 {
-    color: #007BFF;
-}
-
-p {
-    color: #555;
+#status {
+    color: #333;
+    font-size: 18px;
 }
