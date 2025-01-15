@@ -1,14 +1,14 @@
-(function () {
-    console.log("Widget script loaded.");
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM fully loaded. Script starting.");
 
     // Countdown timer configuration
     const countdownTime = 2; // Timer duration in seconds
     let timeRemaining = countdownTime;
 
     // Ensure the form exists
-    const formElement = document.getElementById("250137186711049");
+    const formElement = document.querySelector("form#250137186711049");
     if (!formElement) {
-        console.error("Form not found in the DOM.");
+        console.error("Form not found in the DOM. Ensure the form ID is correct.");
         return;
     }
 
@@ -55,4 +55,4 @@
             console.error("Error while submitting the form:", error);
         }
     }
-})();
+});
