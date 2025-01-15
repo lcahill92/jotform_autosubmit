@@ -40,24 +40,6 @@
         }, 1000);
     });
 
-    // Custom fetch with timeout
-    async function fetchWithTimeout(resource, options = {}, timeout = 5000) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
-
-        try {
-            const response = await fetch(resource, {
-                ...options,
-                signal: controller.signal,
-            });
-            clearTimeout(id);
-            return response;
-        } catch (error) {
-            clearTimeout(id);
-            throw error; // Rethrow to handle in the main flow
-        }
-    }
-
     async function submitForm(apiKey, formId) {
         console.log("Submitting the form...");
 
@@ -70,9 +52,11 @@
                 if (!receivedFormData) {
                     console.error("Timeout: Did not receive form data from parent.");
                 }
-            }, 5000);
+            }, 10000); // Extended to 10 seconds
 
             window.addEventListener("message", async (event) => {
+                console.log("Event Received:", event);
+
                 if (event.data.type === "allValues") {
                     receivedFormData = true; // Stop fallback timer
                     clearTimeout(fallbackTimeout);
@@ -94,32 +78,28 @@
                     const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
                     console.log("API Request URL:", apiUrl);
 
-                    try {
-                        const response = await fetchWithTimeout(apiUrl, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                submission: formattedData,
-                            }),
-                        }, 5000); // 5-second timeout
+                    const response = await fetch(apiUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            submission: formattedData,
+                        }),
+                    });
 
-                        const result = await response.json();
-                        console.log("API Response:", result);
+                    const result = await response.json();
+                    console.log("API Response:", result);
 
-                        if (!response.ok || !result.success) {
-                            console.error("Submission failed:", result.message || "Unknown error");
-                            return;
-                        }
-
-                        console.log("Submission successful:", result);
-
-                        // Notify the parent form of submission success
-                        window.parent.postMessage({ type: "submissionSuccess" }, "*");
-                    } catch (fetchError) {
-                        console.error("Error during API fetch:", fetchError);
+                    if (!response.ok || !result.success) {
+                        console.error("Submission failed:", result.message || "Unknown error");
+                        return;
                     }
+
+                    console.log("Submission successful:", result);
+
+                    // Notify the parent form of submission success
+                    window.parent.postMessage({ type: "submissionSuccess" }, "*");
                 }
             });
         } catch (error) {
