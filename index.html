@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom JotForm Widget</title>
-
-    <!-- Add custom styles -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- JotForm Widget API -->
-    <script src="https://cdn.jotform.com/s/umd/latest/for-custom-widgets.js"></script>
-
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Extract URL Parameters</title>
 </head>
-
 <body>
-    <div id="widget-container">
-        <p id="status">Initializing......</p>
-    </div>
+    <script>
+        /**
+         * Function to extract key-value pairs from a URL
+         * @param {string} url - The URL to extract parameters from
+         * @returns {object} - An object containing key-value pairs
+         */
+        function getUrlParameters(url) {
+            const params = {};
+            
+            // Parse the URL and extract the query string
+            const urlObject = new URL(url);
+            const queryString = urlObject.search;
+            
+            // Use URLSearchParams to iterate over the parameters
+            const urlParams = new URLSearchParams(queryString);
+            urlParams.forEach((value, key) => {
+                params[key] = value;
+            });
+            
+            return params;
+        }
 
-    <!-- Add custom scripts -->
-    <script src="script.js"></script>
+        // Get the current URL dynamically (for the widget)
+        const currentUrl = window.location.href;
+
+        // Extract parameters from the current URL
+        const parameters = getUrlParameters(currentUrl);
+
+        // Log the extracted parameters to the console
+        console.log("Extracted Parameters:", parameters);
+
+        // Example: Log individual parameters (if any)
+        for (const [key, value] of Object.entries(parameters)) {
+            console.log(`${key}: ${value}`);
+        }
+    </script>
 </body>
-
 </html>
