@@ -2,18 +2,26 @@
     const countdownTime = 2; // Timer duration in seconds
     let timeRemaining = countdownTime;
   
-    // Function to extract Form ID from the parent URL
+    // Function to extract Form ID from URL or settings
     function getFormIdFromUrl() {
       try {
+        // Attempt to retrieve from `window.location.search`
+        const urlParams = new URLSearchParams(window.location.search);
+        const formId = urlParams.get("formID");
+        if (formId) {
+          console.log("Form ID from window.location.search:", formId);
+          return formId;
+        }
+  
+        // Fallback to `document.referrer`
         const parentUrl = document.referrer; // Parent form URL
         console.log("Parent URL:", parentUrl);
   
         // Extract the form ID from the URL path
         const url = new URL(parentUrl);
-        const formId = url.pathname.split("/").pop(); // Get the last part of the path
-        return formId || null;
+        return url.pathname.split("/").pop() || null;
       } catch (error) {
-        console.error("Error extracting Form ID from parent URL:", error);
+        console.error("Error extracting Form ID:", error);
         return null;
       }
     }
@@ -28,10 +36,7 @@
   
       // Retrieve API key and Form ID
       const apiKey = widgetSettings.apiKey; // API key passed via widget settings
-      let formId = widgetSettings.formId || widgetSettings.refFormID;
-      if (!formId) {
-        formId = getFormIdFromUrl();
-      }
+      let formId = widgetSettings.formId || widgetSettings.refFormID || getFormIdFromUrl();
   
       console.log("Form ID:", formId);
       console.log("API Key:", apiKey);
