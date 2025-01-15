@@ -1,25 +1,15 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>JotForm Auto Submit Widget</title>
-    <!-- Include any custom styles here -->
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 20px;
-      }
-      h3 {
-        color: #333;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="widget-container">
-      <h3>The form will auto-submit shortly...</h3>
-    </div>
+<head>
+  <title>Countdown Widget</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="countdown-widget">
+    <h3>Time Remaining: <span id="timer">10</span> seconds</h3>
+  </div>
 
-    <!-- Include the bundled JavaScript -->
-    <script src="./dist/bundle.js"></script>
-  </body>
+  <!-- Include Widget Logic -->
+  <script src="widget.js"></script>
+</body>
 </html>
