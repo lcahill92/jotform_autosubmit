@@ -1,16 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Countdown Widget</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Widget</title>
+    <script>
+        // Countdown and auto-submit logic
+        document.addEventListener("DOMContentLoaded", function () {
+            const formId = "250137186711049"; // Replace with your form ID
+            const countdownSeconds = 2; // Countdown in seconds
+            const formElement = document.getElementById(formId);
+            const countdownDisplay = document.createElement("div");
+
+            // Display the countdown timer
+            countdownDisplay.id = "countdown-timer";
+            countdownDisplay.style.fontSize = "16px";
+            countdownDisplay.style.fontWeight = "bold";
+            countdownDisplay.style.marginBottom = "10px";
+            countdownDisplay.innerText = `Submitting in ${countdownSeconds} seconds...`;
+            document.body.insertBefore(countdownDisplay, formElement);
+
+            // Start the countdown
+            let remainingTime = countdownSeconds;
+            const timerInterval = setInterval(() => {
+                remainingTime--;
+                countdownDisplay.innerText = `Submitting in ${remainingTime} seconds...`;
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    // Submit the form automatically
+                    if (formElement) {
+                        formElement.submit();
+                    } else {
+                        console.error("Form not found in the DOM.");
+                    }
+                }
+            }, 1000);
+        });
+    </script>
 </head>
 <body>
-  <div id="countdown-widget">
-    <h3>Time Remaining: <span id="timer">2</span> seconds</h3>
-  </div>
-
-  <!-- Include Widget Logic -->
-  <script src="widget.js"></script>
+    <div>
+        <h1>Custom Widget</h1>
+        <p>This is a custom widget that automatically submits the form after a countdown.</p>
+    </div>
 </body>
 </html>
