@@ -50,12 +50,16 @@
 
         try {
             // Request all field values from the parent form
+            console.log("Requesting all field values...");
             window.parent.postMessage({ type: "getAllValues" }, "*");
 
             // Listen for form values from JotForm
             window.addEventListener("message", async (event) => {
+                console.log("Event Data:", event);
+
                 if (event.data.type === "allValues") {
                     const formData = event.data.values;
+                    console.log("Form Data to be submitted:", formData);
 
                     // Submit the form data via JotForm API
                     const response = await fetch(`https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`, {
@@ -67,6 +71,12 @@
                             submission: formData,
                         }),
                     });
+
+                    console.log("API Response:", response);
+                    if (!response.ok) {
+                        console.error("API Request Failed. Status:", response.status, "Status Text:", response.statusText);
+                        return;
+                    }
 
                     const result = await response.json();
                     console.log("Submission successful:", result);
