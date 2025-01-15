@@ -3,39 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Countdown Widget</title>
+  <title>Widget with Debugging</title>
 </head>
 <body>
-  <div id="countdown"></div>
-
+  <div id="countdown">Preparing to submit...</div>
   <script>
-    // Set the countdown timer in seconds
-    let countdown = 2;
+    // Helper function for logging debug messages
+    function logDebug(message) {
+      console.log(`[Widget Debug]: ${message}`);
+    }
 
-    // Reference to the countdown display
-    const countdownElement = document.getElementById("countdown");
-    countdownElement.innerText = `Submitting in ${countdown} seconds...`;
+    document.addEventListener("DOMContentLoaded", function () {
+      let countdown = 3; // Countdown seconds
+      const countdownElement = document.getElementById("countdown");
 
-    // Start the countdown
-    const countdownInterval = setInterval(() => {
-      countdown--;
-      countdownElement.innerText = `Submitting in ${countdown} seconds...`;
+      // Log that the widget has loaded
+      logDebug("Widget loaded successfully.");
 
-      if (countdown <= 0) {
-        clearInterval(countdownInterval);
+      // Start the countdown
+      const interval = setInterval(() => {
+        logDebug(`Countdown: ${countdown} seconds remaining.`);
+        countdownElement.textContent = `Submitting in ${countdown} seconds...`;
+        countdown--;
 
-        // Send a message to the parent window to submit the form
-        try {
-          window.parent.postMessage(
-            { action: "submitForm" }, // Message payload
-            "*" // Allow all origins for now
-          );
-          console.log("Message sent to parent to submit the form.");
-        } catch (error) {
-          console.error("Error sending message to parent:", error);
+        if (countdown < 0) {
+          clearInterval(interval);
+
+          // Attempt to notify parent form to submit
+          try {
+            logDebug("Attempting to send postMessage to parent...");
+            window.parent.postMessage({ action: "submitForm" }, "*");
+            logDebug("postMessage sent to parent successfully.");
+          } catch (error) {
+            logDebug(`Error sending postMessage: ${error.message}`);
+            countdownElement.textContent = "Error: Unable to notify parent form.";
+          }
         }
+      }, 1000);
+
+      // Debug listener for messages coming to the widget
+      window.addEventListener("message", (event) => {
+        logDebug(`Received message from parent: ${JSON.stringify(event.data)}`);
+      });
+
+      // Add error handling for the form submission process
+      try {
+        const formElement = window.parent.document.getElementById("250137186711049");
+        if (!formElement) {
+          logDebug("Parent form not found. Ensure correct form ID.");
+        } else {
+          logDebug("Parent form found successfully.");
+        }
+      } catch (error) {
+        logDebug(`Error accessing parent form: ${error.message}`);
       }
-    }, 1000);
+    });
   </script>
 </body>
 </html>
