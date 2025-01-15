@@ -55,36 +55,60 @@
 
             // Listen for form values from JotForm
             window.addEventListener("message", async (event) => {
-                console.log("Event Data:", event);
+                console.log("Event Received:", event);
 
                 if (event.data.type === "allValues") {
                     const formData = event.data.values;
                     console.log("Form Data to be submitted:", formData);
 
+                    if (!formData || Object.keys(formData).length === 0) {
+                        console.error("Form Data is empty. Cannot submit.");
+                        return;
+                    }
+
                     // Submit the form data via JotForm API
+                    console.log("Making API request...");
                     const response = await fetch(`https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`, {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
                             submission: formData,
                         }),
                     });
 
-                    console.log("API Response:", response);
+                    console.log("API Response Status:", response.status);
+                    const result = await response.json();
+                    console.log("API Response Data:", result);
+
                     if (!response.ok) {
-                        console.error("API Request Failed. Status:", response.status, "Status Text:", response.statusText);
+                        console.error("API Request Failed. Status:", response.status, "Error:", result);
                         return;
                     }
 
-                    const result = await response.json();
                     console.log("Submission successful:", result);
 
                     // Notify the parent form of submission success
                     window.parent.postMessage({ type: "submissionSuccess" }, "*");
                 }
             });
+
+            // Mock submission for debugging (optional, remove this block when live)
+            const mockFormData = { name: "Test User", email: "test@example.com" };
+            console.log("Using Mock Form Data:", mockFormData);
+            const mockResponse = await fetch(`https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    submission: mockFormData,
+                }),
+            });
+            console.log("Mock API Response Status:", mockResponse.status);
+            console.log("Mock API Response Data:", await mockResponse.json());
+
         } catch (error) {
             console.error("Error submitting the form:", error);
         }
