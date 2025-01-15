@@ -2,25 +2,45 @@
     const countdownTime = 2; // Timer duration in seconds
     let timeRemaining = countdownTime;
 
+    // Decrypt the API key
+    const decryptionKey = "your-secret-key"; // Securely store this key
+    function decryptApiKey(encryptedKey) {
+        try {
+            const bytes = CryptoJS.AES.decrypt(encryptedKey, decryptionKey);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            console.error("Error decrypting API key:", error);
+            return null;
+        }
+    }
+
+    // Get query parameters
+    function getQueryParam(key) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(key);
+    }
+
     // Wait for the widget to be ready
     JFCustomWidget.subscribe("ready", async () => {
         console.log("Widget is ready.");
 
-        // Get widget settings
-        const widgetSettings = JFCustomWidget.getWidgetSettings();
-        console.log("Widget Settings:", widgetSettings);
+        const encryptedApiKey = getQueryParam("encryptedApiKey");
+        const formId = getQueryParam("formID");
 
-        // Retrieve API key and Form ID from widget settings
-        const apiKey = widgetSettings.apiKey; // API key passed via widget settings
-        const formId = widgetSettings.formId; // Form ID passed via widget settings
-
-        console.log("Form ID:", formId);
-        console.log("API Key:", apiKey);
-
-        if (!formId) {
-            console.error("Form ID is missing from widget settings!");
+        if (!encryptedApiKey || !formId) {
+            console.error("Required parameters missing (encryptedApiKey, formID)!");
             return;
         }
+
+        const apiKey = decryptApiKey(encryptedApiKey);
+
+        if (!apiKey) {
+            console.error("Failed to decrypt API key!");
+            return;
+        }
+
+        console.log("Decrypted API Key:", apiKey);
+        console.log("Form ID:", formId);
 
         // Ensure the timer element exists
         const timerElement = document.getElementById("timer");
@@ -49,65 +69,28 @@
         console.log("Submitting the form...");
 
         try {
-            // Request all field values from the parent form
-            console.log("Requesting all field values...");
-            window.parent.postMessage({ type: "getAllValues" }, "*");
+            const apiUrl = `https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`;
+            console.log("API Request URL:", apiUrl);
 
-            // Listen for form values from JotForm
-            window.addEventListener("message", async (event) => {
-                console.log("Event Received:", event);
-
-                if (event.data.type === "allValues") {
-                    const formData = event.data.values;
-                    console.log("Form Data to be submitted:", formData);
-
-                    if (!formData || Object.keys(formData).length === 0) {
-                        console.error("Form Data is empty. Cannot submit.");
-                        return;
-                    }
-
-                    // Submit the form data via JotForm API
-                    console.log("Making API request...");
-                    const response = await fetch(`https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            submission: formData,
-                        }),
-                    });
-
-                    console.log("API Response Status:", response.status);
-                    const result = await response.json();
-                    console.log("API Response Data:", result);
-
-                    if (!response.ok) {
-                        console.error("API Request Failed. Status:", response.status, "Error:", result);
-                        return;
-                    }
-
-                    console.log("Submission successful:", result);
-
-                    // Notify the parent form of submission success
-                    window.parent.postMessage({ type: "submissionSuccess" }, "*");
-                }
-            });
-
-            // Mock submission for debugging (optional, remove this block when live)
-            const mockFormData = { name: "Test User", email: "test@example.com" };
-            console.log("Using Mock Form Data:", mockFormData);
-            const mockResponse = await fetch(`https://api.jotform.com/form/${formId}/submissions?apiKey=${apiKey}`, {
+            const response = await fetch(apiUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    submission: mockFormData,
+                    submission: { name: "Test User", email: "test@example.com" }, // Replace with actual form data
                 }),
             });
-            console.log("Mock API Response Status:", mockResponse.status);
-            console.log("Mock API Response Data:", await mockResponse.json());
+
+            const result = await response.json();
+            console.log("API Response:", result);
+
+            if (!response.ok) {
+                console.error("API Request Failed. Status:", response.status, "Error:", result);
+                return;
+            }
+
+            console.log("Submission successful:", result);
 
         } catch (error) {
             console.error("Error submitting the form:", error);
