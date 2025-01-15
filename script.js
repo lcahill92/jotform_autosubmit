@@ -1,25 +1,26 @@
-JFCustomWidget.subscribe('ready', () => {
-    console.log('Widget is ready!');
+JFCustomWidget.subscribe("ready", function () {
+    // Get the widget settings
+    const settings = JFCustomWidget.getWidgetSettings();
+    
+    // Extract the form ID from the widget settings
+    const formId = settings.formId || "Unknown Form ID";
+    const formFields = settings.fields || {}; // Extract form fields from settings
 
+    // Log the form ID for debugging
+    console.log("Form ID:", formId);
+
+    // Check if form fields are available
+    if (!formFields || Object.keys(formFields).length === 0) {
+        console.error("No fields found in the widget settings. Ensure the widget is properly configured.");
+        return;
+    }
+
+    // Log fields and their values after a 2-second delay
     setTimeout(() => {
-        try {
-            // Get all the field IDs from the widget settings
-            const settings = JFCustomWidget.getWidgetSettings();
-            console.log('Widget settings:', settings);
-
-            const formFields = settings.fields || {};
-            if (!formFields || Object.keys(formFields).length === 0) {
-                throw new Error('formFields is undefined or empty. Check widget configuration.');
-            }
-
-            console.log('Form Fields:', formFields);
-
-            // Fetch field values by IDs
-            JFCustomWidget.getFieldsValueById(Object.keys(formFields), (responses) => {
-                console.log('Form Responses:', responses);
-            });
-        } catch (error) {
-            console.error('Error fetching fields and responses:', error);
-        }
-    }, 2000); // Delay of 2 seconds
+        console.log("Form Fields and Values:");
+        Object.keys(formFields).forEach((key) => {
+            const field = formFields[key];
+            console.log(`Field ID: ${key}, Label: ${field.label}, Value: ${field.value || "Not Filled"}`);
+        });
+    }, 2000);
 });
