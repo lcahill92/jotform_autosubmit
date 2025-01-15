@@ -7,7 +7,7 @@
     </head>
     <body>
         <div id="widget-container">
-            <h3>The form will auto-submit shortly (test)....</h3>
+            <h3>The form will auto-submit shortly....</h3>
         </div>
         <script type="text/javascript">
             // Subscribe to the "ready" event to initialize the widget
@@ -24,12 +24,12 @@
         try {
             const submissionData = {
                 valid: true, // Mark the widget as valid
-                value: "Test submission value" // Placeholder value
+                value: "a" // Placeholder value
             };
             console.log("Sending submission data:", submissionData);
 
             // Trigger form submission
-            JFCustomWidget.sendSubmit(submissionData);
+            JFCustomWidget.sendData(submissionData);
             console.log("Form submission sent successfully.");
         } catch (error) {
             console.error("Error during submission:", error);
