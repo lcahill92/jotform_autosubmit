@@ -8,7 +8,7 @@
 
         const widgetSettings = JFCustomWidget.getWidgetSettings();
         const apiKey = widgetSettings.apiKey;
-        const formId = widgetSettings.formId;
+        const formId = widgetSettings.formId; 
 
         console.log("Form ID:", formId);
         console.log("API Key:", apiKey);
