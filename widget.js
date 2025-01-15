@@ -2,26 +2,21 @@
     const countdownTime = 2; // Timer duration in seconds
     let timeRemaining = countdownTime;
   
-    // Function to extract Form ID from URL or settings
+    // Function to extract Form ID from query parameters
     function getFormIdFromUrl() {
       try {
-        // Attempt to retrieve from `window.location.search`
+        // Check `window.location.search` for `formID`
         const urlParams = new URLSearchParams(window.location.search);
         const formId = urlParams.get("formID");
         if (formId) {
-          console.log("Form ID from window.location.search:", formId);
+          console.log("Form ID from query parameters:", formId);
           return formId;
         }
   
-        // Fallback to `document.referrer`
-        const parentUrl = document.referrer; // Parent form URL
-        console.log("Parent URL:", parentUrl);
-  
-        // Extract the form ID from the URL path
-        const url = new URL(parentUrl);
-        return url.pathname.split("/").pop() || null;
+        console.error("Form ID not found in query parameters.");
+        return null;
       } catch (error) {
-        console.error("Error extracting Form ID:", error);
+        console.error("Error extracting Form ID from URL:", error);
         return null;
       }
     }
