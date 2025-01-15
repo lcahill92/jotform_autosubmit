@@ -7,10 +7,10 @@
     </head>
     <body>
         <div id="widget-container">
-            <h3>The form will auto-submit shortly.....</h3>
+            <h3>The form will auto-submit shortly...</h3>
         </div>
         <script type="text/javascript">
-            // Initialize the widget when ready
+            // Subscribe to the "ready" event to initialize the widget
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget SDK is ready!");
 
@@ -20,7 +20,7 @@
                 });
                 console.log("Initialization data sent to JotForm.");
 
-                // Trigger auto-submit after a delay
+                // Trigger auto-submit after a short delay
                 setTimeout(function () {
                     console.log("Attempting to auto-submit the form...");
                     try {
@@ -33,12 +33,17 @@
                     } catch (error) {
                         console.error("Error during form submission:", error);
                     }
-                }, 3000); // 3-second delay
+                }, 3000); // Adjust the delay as needed
             });
 
             // Log any subscription errors for debugging
             JFCustomWidget.subscribe("error", function (error) {
                 console.error("Widget SDK error:", error);
+            });
+
+            // Confirm submission acknowledgment from JotForm
+            JFCustomWidget.subscribe("submitAcknowledged", function () {
+                console.log("Form submission acknowledged by JotForm.");
             });
         </script>
     </body>
