@@ -4,60 +4,17 @@
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
 </head>
 <body>
+    <!-- Main widget container -->
     <div id="main">
         <h3>Dynamic Data Widget</h3>
         <ul id="dataList"></ul>
         <input type="text" id="userInput" placeholder="Enter additional data">
     </div>
-    <script type="text/javascript">
-        // Initialize a data store to capture dynamic inputs
-        let dataStore = {};
 
-        // Ensure the widget is ready
-        JFCustomWidget.subscribe("ready", function () {
-            console.log("Widget is ready to receive data.");
+    <!-- Example hidden field in the form -->
+    <input id="input_95" class="form-hidden form-widget" type="hidden" name="q95_typeA" value="test@test.ca">
 
-            // Example: Dynamically update the widget with external data
-            JFCustomWidget.subscribe("setData", function (data) {
-                console.log("Received external data:", data);
-
-                // Merge new data with existing data
-                dataStore = { ...dataStore, ...data };
-                updateDataList();
-            });
-
-            // Handle form submission
-            JFCustomWidget.subscribe("submit", function () {
-                console.log("Submitting data:", dataStore);
-
-                // Include user input from the text field
-                const userInput = document.getElementById("userInput").value;
-                if (userInput) {
-                    dataStore["userInput"] = userInput;
-                }
-
-                // Send data to JotForm with the `valid` attribute
-                const msg = {
-                    valid: true,
-                    value: dataStore,
-                };
-
-                console.log("Final submission data:", msg);
-                JFCustomWidget.sendSubmit(msg);
-            });
-        });
-
-        // Function to update the display list
-        function updateDataList() {
-            const dataList = document.getElementById("dataList");
-            dataList.innerHTML = ""; // Clear existing list
-
-            Object.entries(dataStore).forEach(([key, value]) => {
-                const listItem = document.createElement("li");
-                listItem.textContent = `${key}: ${value}`;
-                dataList.appendChild(listItem);
-            });
-        }
-    </script>
+    <!-- Reference the external widget.js file -->
+    <script src="https://lcahill92.github.io/jotform_autosubmit/widget.js"></script>
 </body>
 </html>

@@ -1,28 +1,67 @@
-// Wait until the widget is ready
+// Initialize a data store to capture dynamic inputs
+let dataStore = {};
+
+// Function to fetch and log values from hidden input fields
+function fetchAndLogFormValues() {
+    // Select the hidden input field dynamically (you can customize this selector if needed)
+    const hiddenField = document.querySelector('input[type="hidden"][name="q95_typeA"]');
+
+    if (hiddenField) {
+        console.log("Hidden field value:", hiddenField.value);
+        dataStore["hiddenField"] = hiddenField.value; // Store the hidden field value in the data store
+    } else {
+        console.warn("Hidden field not found.");
+    }
+}
+
+// Ensure the widget is ready
 JFCustomWidget.subscribe("ready", function () {
     console.log("Widget is ready to receive data.");
 
-    // Display data in the widget
-    function displayData(data) {
-        const dataList = document.getElementById("data-list");
-        dataList.innerHTML = ""; // Clear previous data
-        Object.entries(data).forEach(([field, value]) => {
-            const listItem = document.createElement("li");
-            listItem.textContent = `${field}: ${value}`;
-            dataList.appendChild(listItem);
-        });
-    }
+    // Fetch and log form values when the widget is ready
+    fetchAndLogFormValues();
 
-    // Listen for incoming data
+    // Example: Dynamically update the widget with external data
     JFCustomWidget.subscribe("setData", function (data) {
-        console.log("Received data:", data);
-        displayData(data); // Update the widget's display
+        console.log("Received external data:", data);
+
+        // Merge new data with existing data
+        dataStore = { ...dataStore, ...data };
+        updateDataList();
+    });
+
+    // Handle form submission
+    JFCustomWidget.subscribe("submit", function () {
+        console.log("Submitting data:", dataStore);
+
+        // Include user input from the text field
+        const userInput = document.getElementById("userInput").value;
+        if (userInput) {
+            dataStore["userInput"] = userInput;
+        }
+
+        // Fetch and include the hidden field value
+        fetchAndLogFormValues();
+
+        // Convert the dataStore object to a JSON string
+        const msg = {
+            valid: true,
+            value: JSON.stringify(dataStore), // Stringify the data
+        };
+
+        console.log("Final submission data:", msg);
+        JFCustomWidget.sendSubmit(msg);
     });
 });
 
-// Handle form submission
-JFCustomWidget.subscribe("submit", function () {
-    console.log("Form submitted.");
-    // Optionally send data to JotForm
-    JFCustomWidget.sendData({ submitted: true });
-});
+// Function to update the display list
+function updateDataList() {
+    const dataList = document.getElementById("dataList");
+    dataList.innerHTML = ""; // Clear existing list
+
+    Object.entries(dataStore).forEach(([key, value]) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${key}: ${value}`;
+        dataList.appendChild(listItem);
+    });
+}
