@@ -15,9 +15,9 @@
         </div>
         <script type="text/javascript">
             // Function to locate and log the value of the hidden input field
-            function findAndLogHiddenFieldValue(fieldName) {
-                // Construct the selector dynamically based on the widget setting (field1)
-                const hiddenFieldSelector = `input[name]="q${qid}_${fieldName}"]`; // Adjust prefix if necessary
+            function findAndLogHiddenFieldValue(qid, fieldName) {
+                // Construct the selector dynamically using QID and fieldName
+                const hiddenFieldSelector = `input[name="q${qid}_${fieldName}"]`;
                 const hiddenField = document.querySelector(hiddenFieldSelector);
 
                 if (hiddenField) {
@@ -29,19 +29,28 @@
 
             // Always subscribe to the ready event and implement widget-related code inside the callback function
             JFCustomWidget.subscribe("ready", function() {
-                // Log all widget settings to the console
+                // Retrieve all widget settings
                 const settings = JFCustomWidget.getWidgetSettings();
                 console.log("Widget settings:", settings);
 
-                // Fetch the value of field1 from the settings
+                // Fetch QID and field1 from widget settings
+                const qid = settings.qid;
                 const field1 = settings.field1;
-                if (field1) {
-                    console.log(`Looking for hidden field with name derived from: ${field1}`);
-                    // Locate and log the value of the hidden input field
-                    findAndLogHiddenFieldValue(field1);
-                } else {
-                    console.error("field1 is not defined in the widget settings.");
+
+                // Validate QID and field1
+                if (!qid) {
+                    console.error("QID is not defined in the widget settings.");
+                    return;
                 }
+                if (!field1) {
+                    console.error("field1 is not defined in the widget settings.");
+                    return;
+                }
+
+                console.log(`Looking for hidden field with QID: ${qid} and field name: ${field1}`);
+                
+                // Locate and log the value of the hidden input field
+                findAndLogHiddenFieldValue(qid, field1);
 
                 // Subscribe to the form submit event
                 JFCustomWidget.subscribe("submit", function() {
