@@ -6,23 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JotForm Widget URL Detection</title>
 
-    <!-- Example Canonical Link (if available in the deployed environment) -->
-    <link rel="canonical" href="https://form.jotform.com/example">
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://form.jotform.com/250137186711049?submission=bad">
+    <!-- Open Graph URL -->
+    <meta property="og:url" content="https://form.jotform.com/250137186711049">
 </head>
 
 <body>
     <script>
-        function detectUrl() {
-            let detectedUrls = [];
+        function findCanonicalUrl() {
+            const detectedUrls = [];
             let finalUrl = null;
 
             try {
-                // Attempt 1: <link rel="canonical">
+                // Attempt 1: Check for <link rel="canonical">
                 const canonicalTag = document.querySelector('link[rel="canonical"]');
-                if (canonicalTag) {
-                    const canonicalUrl = canonicalTag.href;
-                    detectedUrls.push("[Attempt 1: Canonical Tag] URL:", canonicalUrl);
-                    finalUrl = canonicalUrl;
+                if (canonicalTag && canonicalTag.href) {
+                    detectedUrls.push("[Attempt 1: Canonical Tag] URL:", canonicalTag.href);
+                    finalUrl = canonicalTag.href;
                 } else {
                     detectedUrls.push("[Attempt 1: Canonical Tag] No canonical tag found.");
                 }
@@ -31,36 +32,40 @@
             }
 
             try {
-                // Attempt 2: document.location.href
+                // Attempt 2: Check for <meta property="og:url">
+                const ogUrlMeta = document.querySelector('meta[property="og:url"]');
+                if (ogUrlMeta && ogUrlMeta.content) {
+                    detectedUrls.push("[Attempt 2: OG URL Meta Tag] URL:", ogUrlMeta.content);
+                    if (!finalUrl) finalUrl = ogUrlMeta.content;
+                } else {
+                    detectedUrls.push("[Attempt 2: OG URL Meta Tag] No OG URL meta tag found.");
+                }
+            } catch (error) {
+                detectedUrls.push("[Attempt 2: OG URL Meta Tag] Error reading OG URL meta tag:", error);
+            }
+
+            try {
+                // Attempt 3: Fallback to document.location.href
                 const locationHref = document.location.href;
-                detectedUrls.push("[Attempt 2: document.location.href] URL:", locationHref);
+                detectedUrls.push("[Attempt 3: document.location.href] URL:", locationHref);
                 if (!finalUrl) finalUrl = locationHref;
             } catch (error) {
-                detectedUrls.push("[Attempt 2: document.location.href] Error:", error);
+                detectedUrls.push("[Attempt 3: document.location.href] Error:", error);
             }
 
             try {
-                // Attempt 3: document.URL
+                // Attempt 4: Fallback to document.URL
                 const documentUrl = document.URL;
-                detectedUrls.push("[Attempt 3: document.URL] URL:", documentUrl);
+                detectedUrls.push("[Attempt 4: document.URL] URL:", documentUrl);
                 if (!finalUrl) finalUrl = documentUrl;
             } catch (error) {
-                detectedUrls.push("[Attempt 3: document.URL] Error:", error);
+                detectedUrls.push("[Attempt 4: document.URL] Error:", error);
             }
 
-            try {
-                // Attempt 4: window.location.href
-                const windowHref = window.location.href;
-                detectedUrls.push("[Attempt 4: window.location.href] URL:", windowHref);
-                if (!finalUrl) finalUrl = windowHref;
-            } catch (error) {
-                detectedUrls.push("[Attempt 4: window.location.href] Error:", error);
-            }
+            // Log all detection attempts
+            console.log("URL Detection Attempts:", detectedUrls);
 
-            // Log all attempts
-            console.log("All URL Detection Attempts:", detectedUrls);
-
-            // Log final detected URL
+            // Log the final URL (if found)
             if (finalUrl) {
                 console.log("Final Detected URL:", finalUrl);
             } else {
@@ -70,8 +75,8 @@
             return finalUrl;
         }
 
-        // Run URL detection and log the result
-        const finalDetectedUrl = detectUrl();
+        // Call the function to detect and log the URL
+        const detectedUrl = findCanonicalUrl();
     </script>
 </body>
 
