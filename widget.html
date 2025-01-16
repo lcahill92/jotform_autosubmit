@@ -1,51 +1,18 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
-    </head>
-    <body>
-        <div id="main">
-            <h3>My Widget</h3>
-            <p>Fetching widget settings...</p>
-            <div id="settings-output"></div>
-        </div>
-        <script type="text/javascript">
-            // Function to parse and log widget settings
-            function fetchAndLogWidgetSettings() {
-                JFCustomWidget.subscribe("ready", function () {
-                    console.log("Widget is ready.");
+<head>
+    <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+</head>
+<body>
+    <!-- Main widget container -->
+    <div id="main">
+        <h3>Dynamic Data Widget</h3>
+        <ul id="dataList"></ul>
+        <input type="text" id="userInput" placeholder="Enter additional data">
+    </div>
 
-                    // Fetch settings
-                    const settings = JFCustomWidget.getWidgetSettings();
-                    console.log("Widget settings:", settings);
-
-                    // Display settings in the widget for debugging
-                    const outputDiv = document.getElementById('settings-output');
-                    outputDiv.innerHTML = `<pre>${JSON.stringify(settings, null, 2)}</pre>`;
-
-                    // Extract specific values (example: field1)
-                    if (settings.field1) {
-                        console.log(`Field1 value: ${settings.field1}`);
-                    } else {
-                        console.warn("Field1 is not defined in the widget settings.");
-                    }
-                });
-
-                // Subscribe to form submission
-                JFCustomWidget.subscribe("submit", function () {
-                    console.log("Form submission detected.");
-                    const msg = {
-                        valid: true,
-                        value: {
-                            status: "Submitted",
-                        },
-                    };
-                    JFCustomWidget.sendSubmit(msg);
-                });
-            }
-
-            // Initialize widget
-            fetchAndLogWidgetSettings();
-        </script>
-    </body>
+  
+    <!-- Reference the external widget.js file -->
+    <script src="https://lcahill92.github.io/jotform_autosubmit/widget.js"></script>
+</body>
 </html>
