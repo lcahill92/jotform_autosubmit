@@ -1,35 +1,28 @@
-// Ensure JFCustomWidget is ready before interacting
+// Wait until the widget is ready
 JFCustomWidget.subscribe("ready", function () {
-    console.log("Widget is ready.");
-    
-    // Handle input field value change
-    const inputField = document.getElementById("custom-input");
-    const errorMessage = document.getElementById("error-message");
+    console.log("Widget is ready to receive data.");
 
-    inputField.addEventListener("input", function () {
-        const inputValue = inputField.value;
-        if (inputValue) {
-            errorMessage.style.display = "none"; // Hide error message
-            // Send the current value to JotForm
-            JFCustomWidget.sendData({ value: inputValue });
-        } else {
-            JFCustomWidget.sendData({ value: null }); // Send null if empty
-        }
+    // Display data in the widget
+    function displayData(data) {
+        const dataList = document.getElementById("data-list");
+        dataList.innerHTML = ""; // Clear previous data
+        Object.entries(data).forEach(([field, value]) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `${field}: ${value}`;
+            dataList.appendChild(listItem);
+        });
+    }
+
+    // Listen for incoming data
+    JFCustomWidget.subscribe("setData", function (data) {
+        console.log("Received data:", data);
+        displayData(data); // Update the widget's display
     });
 });
 
 // Handle form submission
 JFCustomWidget.subscribe("submit", function () {
-    const inputField = document.getElementById("custom-input");
-    const inputValue = inputField.value;
-    const errorMessage = document.getElementById("error-message");
-
-    if (!inputValue) {
-        // Display error if the field is required and empty
-        errorMessage.style.display = "block";
-        JFCustomWidget.sendSubmitError("The input field cannot be empty.");
-    } else {
-        errorMessage.style.display = "none"; // Hide error
-        JFCustomWidget.sendData({ value: inputValue }); // Send data to JotForm
-    }
+    console.log("Form submitted.");
+    // Optionally send data to JotForm
+    JFCustomWidget.sendData({ submitted: true });
 });
