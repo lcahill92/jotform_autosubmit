@@ -1,0 +1,24 @@
+#widget-container {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+#custom-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+#custom-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+#error-message {
+    font-size: 14px;
+    margin-top: 5px;
+}
