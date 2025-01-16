@@ -6,74 +6,46 @@
     <body>
         <div id="main">
             <h3>My Widget</h3>
-            <p>Fetching hidden field values...</p>
-            <div id="hidden-values-output"></div>
+            <p>Fetching widget settings...</p>
+            <div id="settings-output"></div>
         </div>
         <script type="text/javascript">
-            // Function to log hidden field values
-            function fetchAndLogHiddenFields() {
-                console.log("Attempting to fetch hidden fields...");
-                const wrapper = document.querySelector('.widget-inputs-wrapper');
+            // Function to parse and log widget settings
+            function fetchAndLogWidgetSettings() {
+                JFCustomWidget.subscribe("ready", function () {
+                    console.log("Widget is ready.");
 
-                if (wrapper) {
-                    const hiddenFields = wrapper.querySelectorAll('input[type="hidden"]');
-                    if (hiddenFields.length > 0) {
-                        const hiddenValues = Array.from(hiddenFields).map(input => ({
-                            name: input.name,
-                            value: input.value,
-                        }));
-                        console.log("Hidden field values found:", hiddenValues);
+                    // Fetch settings
+                    const settings = JFCustomWidget.getWidgetSettings();
+                    console.log("Widget settings:", settings);
 
-                        // Display the values in the widget
-                        const outputDiv = document.getElementById('hidden-values-output');
-                        outputDiv.innerHTML = `<pre>${JSON.stringify(hiddenValues, null, 2)}</pre>`;
+                    // Display settings in the widget for debugging
+                    const outputDiv = document.getElementById('settings-output');
+                    outputDiv.innerHTML = `<pre>${JSON.stringify(settings, null, 2)}</pre>`;
+
+                    // Extract specific values (example: field1)
+                    if (settings.field1) {
+                        console.log(`Field1 value: ${settings.field1}`);
                     } else {
-                        console.warn("No hidden fields found inside .widget-inputs-wrapper.");
-                    }
-                } else {
-                    console.warn(".widget-inputs-wrapper not found in the DOM.");
-                }
-            }
-
-            // Function to observe dynamic DOM changes
-            function observeDOMChanges() {
-                const observer = new MutationObserver((mutations) => {
-                    for (const mutation of mutations) {
-                        if (mutation.type === 'childList') {
-                            console.log("DOM mutation detected. Checking for hidden fields...");
-                            fetchAndLogHiddenFields();
-                        }
+                        console.warn("Field1 is not defined in the widget settings.");
                     }
                 });
 
-                // Start observing the body for changes
-                observer.observe(document.body, { childList: true, subtree: true });
-                console.log("Started observing DOM for changes.");
+                // Subscribe to form submission
+                JFCustomWidget.subscribe("submit", function () {
+                    console.log("Form submission detected.");
+                    const msg = {
+                        valid: true,
+                        value: {
+                            status: "Submitted",
+                        },
+                    };
+                    JFCustomWidget.sendSubmit(msg);
+                });
             }
 
-            // Retry fetching hidden fields multiple times
-            function retryFetchHiddenFields(attempts = 10) {
-                if (attempts === 0) {
-                    console.error("Failed to locate hidden fields after multiple attempts.");
-                    console.log("Logging entire DOM for debugging...");
-                    console.log(document.body.innerHTML); // Log full DOM
-                    return;
-                }
-
-                setTimeout(() => {
-                    console.log(`Retrying... (${11 - attempts}/10)`);
-                    fetchAndLogHiddenFields();
-                    retryFetchHiddenFields(attempts - 1);
-                }, 500); // Retry every 500ms
-            }
-
-            // Widget initialization
-            JFCustomWidget.subscribe("ready", function () {
-                console.log("Widget is ready.");
-                fetchAndLogHiddenFields(); // Initial fetch
-                retryFetchHiddenFields(); // Retry if needed
-                observeDOMChanges(); // Monitor for dynamic changes
-            });
+            // Initialize widget
+            fetchAndLogWidgetSettings();
         </script>
     </body>
 </html>
