@@ -4,7 +4,7 @@ let dataStore = {};
 // Function to fetch and log values from hidden input fields dynamically
 function fetchAndLogFormValues() {
     // Use querySelector to find the hidden input field by attributes
-    const hiddenField = document.querySelector('input[type="hidden"][name="q95_typeA"]');
+    const hiddenField = document.querySelector('input[type="hidden"][name="q138_typeA"]');
 
     if (hiddenField) {
         console.log("Hidden field value fetched:", hiddenField.value);
