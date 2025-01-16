@@ -4,87 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JotForm Widget</title>
+    <title>JotForm Widget URL Detection</title>
 
-    <!-- Link to custom styles (optional) -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Example Canonical Link -->
+    <link rel="canonical" href="https://form.jotform.com/250137186711049?submission=success">
 </head>
 
 <body>
-    <form class="jotform-form" action="https://submit.jotform.com/submit/250137186711049" method="post" name="form_250137186711049" id="250137186711049">
-        <input type="hidden" name="formID" value="250137186711049">
-        <input type="text" name="name" placeholder="Name">
-        <input type="email" name="email" placeholder="Email">
-        <button type="submit">Submit</button>
-    </form>
-
     <script>
-        // Function to extract the canonical URL and log all form details
-        function extractFormDetails() {
+        function getCanonicalUrl() {
+            let url = null;
+
             try {
-                // Fetch the <form> element
-                const formElement = document.querySelector("form.jotform-form");
-
-                if (!formElement) {
-                    console.error("No form element found on the page.");
-                    return;
+                // Method 1: Check for <link rel="canonical">
+                const canonicalTag = document.querySelector('link[rel="canonical"]');
+                if (canonicalTag) {
+                    url = canonicalTag.href;
+                    console.log("[Method 1] Canonical URL from <link rel='canonical'>:", url);
+                } else {
+                    console.warn("[Method 1] No <link rel='canonical'> tag found.");
                 }
-
-                // Extract the form action URL
-                const actionUrl = formElement.getAttribute("action");
-                console.log("Form Action URL:", actionUrl);
-
-                // Extract the form ID
-                const formId = formElement.querySelector("input[name='formID']")?.value;
-                console.log("Form ID:", formId);
-
-                // Extract input names and their values
-                const inputs = formElement.querySelectorAll("input, select, textarea");
-                const inputData = Array.from(inputs).map(input => ({
-                    name: input.name,
-                    value: input.value,
-                    type: input.type
-                }));
-
-                console.log("Form Inputs and Values:", inputData);
-
-                // Fallback: Log the current page URL
-                const currentPageUrl = document.location.href;
-                console.log("Current Page URL:", currentPageUrl);
-
-                // Return all extracted data
-                return {
-                    actionUrl,
-                    formId,
-                    inputs: inputData,
-                    currentPageUrl
-                };
             } catch (error) {
-                console.error("Error extracting form details:", error);
+                console.error("[Method 1] Error reading canonical tag:", error);
             }
+
+            if (!url) {
+                try {
+                    // Method 2: Use `document.location.href`
+                    url = document.location.href;
+                    console.log("[Method 2] URL from document.location.href:", url);
+                } catch (error) {
+                    console.error("[Method 2] Error reading document.location.href:", error);
+                }
+            }
+
+            if (!url) {
+                try {
+                    // Method 3: Use `document.URL`
+                    url = document.URL;
+                    console.log("[Method 3] URL from document.URL:", url);
+                } catch (error) {
+                    console.error("[Method 3] Error reading document.URL:", error);
+                }
+            }
+
+            if (!url) {
+                try {
+                    // Method 4: Use `window.location.href`
+                    url = window.location.href;
+                    console.log("[Method 4] URL from window.location.href:", url);
+                } catch (error) {
+                    console.error("[Method 4] Error reading window.location.href:", error);
+                }
+            }
+
+            if (!url) {
+                console.error("Failed to retrieve URL using all methods.");
+            } else {
+                console.log("Final URL detected:", url);
+            }
+
+            return url;
         }
 
-        // Call the function and log the extracted details
-        const formDetails = extractFormDetails();
-
-        // If you want to send the extracted data to a webhook
-        if (formDetails) {
-            console.log("Sending extracted data to webhook...");
-            fetch("https://hooks.zapier.com/hooks/catch/16414363/2k229v1/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formDetails)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Webhook Response:", data);
-                })
-                .catch(error => {
-                    console.error("Error sending data to webhook:", error);
-                });
-        }
+        // Execute the URL retrieval and log attempts
+        const detectedUrl = getCanonicalUrl();
     </script>
 </body>
 
