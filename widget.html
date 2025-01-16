@@ -10,18 +10,25 @@
             <div id="hidden-values-output"></div>
         </div>
         <script type="text/javascript">
-            // Function to log all hidden fields in the widget-inputs-wrapper
-            function logHiddenFields() {
+            // Function to log all elements in the widget for debugging
+            function logAllElements() {
+                console.log("Logging all elements in the iframe:");
+                console.log(document.body.innerHTML);
+            }
+
+            // Function to locate and log hidden field values
+            function fetchHiddenFields() {
+                console.log("Attempting to fetch hidden fields...");
                 const wrapper = document.querySelector('.widget-inputs-wrapper');
 
                 if (wrapper) {
-                    const hiddenInputs = wrapper.querySelectorAll('input[type="hidden"]');
-                    if (hiddenInputs.length > 0) {
-                        const hiddenValues = Array.from(hiddenInputs).map(input => ({
+                    const hiddenFields = wrapper.querySelectorAll('input[type="hidden"]');
+                    if (hiddenFields.length > 0) {
+                        const hiddenValues = Array.from(hiddenFields).map(input => ({
                             name: input.name,
                             value: input.value,
                         }));
-                        console.log("Hidden field values:", hiddenValues);
+                        console.log("Hidden field values found:", hiddenValues);
 
                         // Display the values in the widget
                         const outputDiv = document.getElementById('hidden-values-output');
@@ -34,36 +41,30 @@
                 }
             }
 
-            // Function to wait for dynamic DOM changes using MutationObserver
-            function observeForHiddenFields() {
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'childList') {
-                            console.log("DOM change detected. Checking for hidden fields...");
-                            logHiddenFields();
-                        }
-                    });
-                });
+            // Function to retry locating hidden fields with a time delay
+            function retryFetchHiddenFields(attempts = 10) {
+                if (attempts === 0) {
+                    console.error("Failed to locate hidden fields after multiple attempts.");
+                    logAllElements(); // Log all elements for debugging
+                    return;
+                }
 
-                // Observe the entire document body for changes
-                const config = { childList: true, subtree: true };
-                observer.observe(document.body, config);
-
-                console.log("Started observing DOM changes.");
+                setTimeout(() => {
+                    console.log(`Retrying... (${11 - attempts}/10)`);
+                    fetchHiddenFields();
+                    retryFetchHiddenFields(attempts - 1);
+                }, 500); // Retry every 500ms
             }
 
             // Always subscribe to the ready event
             JFCustomWidget.subscribe("ready", function () {
-                console.log("Widget is ready. Fetching hidden fields...");
-                logHiddenFields(); // Attempt to fetch immediately
-
-                // Set up the observer to handle dynamic changes
-                observeForHiddenFields();
+                console.log("Widget is ready. Starting hidden field fetch attempts...");
+                retryFetchHiddenFields(); // Start fetching hidden fields
 
                 // Handle form submission
                 JFCustomWidget.subscribe("submit", function () {
                     console.log("Form submission detected. Re-fetching hidden fields...");
-                    logHiddenFields();
+                    fetchHiddenFields();
 
                     // Send placeholder data to JotForm
                     const msg = {
