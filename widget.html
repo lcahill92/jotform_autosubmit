@@ -14,7 +14,7 @@
             <input type="text" id="userInput2" placeholder="Enter second value">
             <br><br>
             <!-- Example hidden field inside the widget -->
-            <input id="input_116" class="form-hidden form-widget" type="hidden" name="q116_typeA" value="test@test.com">
+            <input id="input_121" class="form-hidden form-widget" type="hidden" name="q121_typeA" value="test@test.com">
         </div>
         <script type="text/javascript">
             // Function to locate and log the value of the hidden input field
@@ -26,48 +26,41 @@
                 if (hiddenField) {
                     console.log(`Value of the hidden field "q${qid}_${fieldName}":`, hiddenField.value);
                 } else {
-                    console.warn(`Hidden field with name "q${qid}_${fieldName}" not found.`);
+                    console.warn(`Hidden field with name "q${qid}_${fieldName}" not found in the widget.`);
                 }
             }
 
-            // Always subscribe to the ready event and implement widget-related code inside the callback function
+            // Always subscribe to the ready event
             JFCustomWidget.subscribe("ready", function () {
-                // Log all widget settings to the console
                 const settings = JFCustomWidget.getWidgetSettings();
                 console.log("Widget settings:", settings);
 
-                // Fetch qid and field1 from widget settings
-                const qid = settings.qid;
-                const field1 = settings.field1;
+                const qid = settings.qid; // Fetch qid from settings
+                const field1 = settings.field1; // Fetch field name suffix
 
                 if (qid && field1) {
                     console.log(`Looking for hidden field with name: q${qid}_${field1}`);
-                    // Locate and log the value of the hidden input field
                     findAndLogHiddenFieldValue(qid, field1);
                 } else {
                     if (!qid) console.error("QID is not defined in the widget settings.");
-                    if (!field1) console.error("field1 is not defined in the widget settings.");
+                    if (!field1) console.error("Field1 is not defined in the widget settings.");
                 }
 
                 // Subscribe to the form submit event
                 JFCustomWidget.subscribe("submit", function () {
-                    // Get values from both input fields
                     const value1 = document.getElementById("userInput1").value;
                     const value2 = document.getElementById("userInput2").value;
 
                     // Prepare the message to send to JotForm
                     const msg = {
-                        valid: true, // Mark as valid
+                        valid: true,
                         value: {
                             field1: value1,
-                            field2: value2
-                        }
+                            field2: value2,
+                        },
                     };
 
-                    // Log the submitted data for debugging
                     console.log("Submitting data:", msg);
-
-                    // Send the values to JotForm
                     JFCustomWidget.sendSubmit(msg);
                 });
             });
