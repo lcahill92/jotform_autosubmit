@@ -15,15 +15,15 @@
         </div>
         <script type="text/javascript">
             // Function to locate and log the value of the hidden input field
-            function findAndLogHiddenFieldValue(fieldId) {
-                // Dynamically construct the selector based on the `field1` value
-                const hiddenFieldSelector = `input[id="${fieldId}"]`;
+            function findAndLogHiddenFieldValue(fieldName) {
+                // Construct the selector dynamically based on the widget setting (field1)
+                const hiddenFieldSelector = `input[name]="q${qid}_${fieldName}"]`; // Adjust prefix if necessary
                 const hiddenField = document.querySelector(hiddenFieldSelector);
 
                 if (hiddenField) {
-                    console.log(`Value of the hidden field with ID "${fieldId}":`, hiddenField.value);
+                    console.log(`Value of the hidden field "${fieldName}":`, hiddenField.value);
                 } else {
-                    console.warn(`Hidden field with ID "${fieldId}" not found.`);
+                    console.warn(`Hidden field with name "${hiddenFieldSelector}" not found.`);
                 }
             }
 
@@ -36,7 +36,7 @@
                 // Fetch the value of field1 from the settings
                 const field1 = settings.field1;
                 if (field1) {
-                    console.log(`Looking for hidden field with ID: ${field1}`);
+                    console.log(`Looking for hidden field with name derived from: ${field1}`);
                     // Locate and log the value of the hidden input field
                     findAndLogHiddenFieldValue(field1);
                 } else {
