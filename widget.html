@@ -6,39 +6,47 @@
     <body>
         <div id="main">
             <h3>My Widget</h3>
-            <p>Fetching values from widget inputs...</p>
+            <p>Fetching hidden field values...</p>
+            <div id="hidden-values-output"></div>
         </div>
         <script type="text/javascript">
-            // Function to log all hidden input values from the widget
-            function logHiddenFieldValues() {
-                // Select all hidden inputs within the widget-inputs-wrapper div
-                const hiddenInputs = document.querySelectorAll('.widget-inputs-wrapper input[type="hidden"]');
+            // Function to fetch and log hidden field values
+            function fetchAndLogHiddenFields() {
+                // Locate the widget-inputs-wrapper div
+                const wrapper = document.querySelector('.widget-inputs-wrapper');
 
-                if (hiddenInputs.length > 0) {
-                    console.log("Hidden field values:");
-                    hiddenInputs.forEach((input) => {
-                        console.log(`Name: ${input.name}, Value: ${input.value}`);
-                    });
+                if (wrapper) {
+                    // Find all hidden inputs inside the wrapper
+                    const hiddenFields = wrapper.querySelectorAll('input[type="hidden"]');
+                    const hiddenValues = Array.from(hiddenFields).map(input => ({
+                        name: input.name,
+                        value: input.value,
+                    }));
+
+                    console.log("Hidden field values:", hiddenValues);
+
+                    // Display the values in the widget
+                    const outputDiv = document.getElementById('hidden-values-output');
+                    outputDiv.innerHTML = `<pre>${JSON.stringify(hiddenValues, null, 2)}</pre>`;
                 } else {
-                    console.warn("No hidden inputs found in the widget-inputs-wrapper.");
+                    console.warn("No .widget-inputs-wrapper found in the widget DOM.");
                 }
             }
 
             // Always subscribe to the ready event
-            JFCustomWidget.subscribe("ready", function () {
+            JFCustomWidget.subscribe('ready', function () {
                 console.log("Widget is ready. Fetching hidden field values...");
-                logHiddenFieldValues();
+                fetchAndLogHiddenFields();
 
-                // Subscribe to the form submit event
-                JFCustomWidget.subscribe("submit", function () {
-                    // Optionally, re-fetch the values on submission
-                    console.log("Form is being submitted. Re-fetching hidden field values...");
-                    logHiddenFieldValues();
+                // Optionally, re-fetch values during form submission
+                JFCustomWidget.subscribe('submit', function () {
+                    console.log("Form submission detected. Re-fetching hidden field values...");
+                    fetchAndLogHiddenFields();
 
-                    // Send dummy data as a placeholder (replace or extend as needed)
+                    // Send placeholder data to JotForm
                     const msg = {
                         valid: true,
-                        value: { exampleKey: "exampleValue" },
+                        value: { status: 'Submitted' },
                     };
                     JFCustomWidget.sendSubmit(msg);
                 });
