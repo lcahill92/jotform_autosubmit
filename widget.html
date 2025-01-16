@@ -12,49 +12,64 @@
             <br><br>
             <label for="userInput2">Field 2:</label>
             <input type="text" id="userInput2" placeholder="Enter second value">
+            <br><br>
+            <!-- Hidden field inside the widget -->
+            <input id="input_116" class="form-hidden form-widget" type="hidden" name="q116_typeA" value="test@test.com">
         </div>
         <script type="text/javascript">
-            // Function to request the value of a hidden field from the parent document
-            function requestHiddenFieldValue(qid, fieldName) {
-                const message = {
-                    type: "getHiddenFieldValue",
-                    qid: qid,
-                    fieldName: fieldName
-                };
-                // Send message to the parent document
-                window.parent.postMessage(message, "*");
-            }
+            // Function to locate and log the value of the hidden input field
+            function findAndLogHiddenFieldValue(qid, fieldName) {
+                // Construct the selector dynamically using qid and fieldName
+                const hiddenFieldSelector = `input[name="q${qid}_${fieldName}"]`;
+                const hiddenField = document.querySelector(hiddenFieldSelector);
 
-            // Function to handle messages from the parent
-            function handleParentResponse(event) {
-                if (event.data.type === "hiddenFieldValueResponse") {
-                    console.log(`Value of the hidden field: ${event.data.value}`);
+                if (hiddenField) {
+                    console.log(`Value of the hidden field "${fieldName}":`, hiddenField.value);
+                } else {
+                    console.warn(`Hidden field with selector "${hiddenFieldSelector}" not found.`);
                 }
             }
 
-            // Always subscribe to the ready event
+            // Always subscribe to the ready event and implement widget-related code inside the callback function
             JFCustomWidget.subscribe("ready", function () {
+                // Log all widget settings to the console
                 const settings = JFCustomWidget.getWidgetSettings();
                 console.log("Widget settings:", settings);
 
-                const qid = settings.qid;
+                // Fetch QID and field1 from widget settings
+                const qid = settings.qid || "116"; // Fallback to default ID if not in settings
                 const field1 = settings.field1;
 
                 if (qid && field1) {
-                    console.log(`Requesting value of hidden field with QID: ${qid} and field name: ${field1}`);
-                    requestHiddenFieldValue(qid, field1);
+                    console.log(`Looking for hidden field with QID: ${qid} and field name: ${field1}`);
+                    // Locate and log the value of the hidden input field
+                    findAndLogHiddenFieldValue(qid, field1);
                 } else {
                     if (!qid) console.error("QID is not defined in the widget settings.");
                     if (!field1) console.error("field1 is not defined in the widget settings.");
                 }
 
-                // Listen for messages from the parent
-                window.addEventListener("message", handleParentResponse, false);
-            });
+                // Subscribe to the form submit event
+                JFCustomWidget.subscribe("submit", function () {
+                    // Get values from both input fields
+                    const value1 = document.getElementById("userInput1").value;
+                    const value2 = document.getElementById("userInput2").value;
 
-            // Unsubscribe from events on unload
-            window.addEventListener("unload", function () {
-                window.removeEventListener("message", handleParentResponse);
+                    // Prepare the message to send to JotForm
+                    const msg = {
+                        valid: true, // Mark as valid
+                        value: {
+                            field1: value1,
+                            field2: value2
+                        }
+                    };
+
+                    // Log the submitted data for debugging
+                    console.log("Submitting data:", msg);
+
+                    // Send the values to JotForm
+                    JFCustomWidget.sendSubmit(msg);
+                });
             });
         </script>
     </body>
