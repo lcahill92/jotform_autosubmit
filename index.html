@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extract URL Parameters</title>
+    <title>Send URL Parameters to Zapier</title>
 </head>
 <body>
     <script>
@@ -28,18 +28,52 @@
             return params;
         }
 
+        /**
+         * Function to send data to a webhook
+         * @param {string} webhookUrl - The webhook URL
+         * @param {object} data - The data to send
+         */
+        async function sendToWebhook(webhookUrl, data) {
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log("Data successfully sent to the webhook:", await response.json());
+                } else {
+                    console.error("Error sending data to the webhook:", response.status, response.statusText);
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+            }
+        }
+
         // Get the current URL dynamically (for the widget)
         const currentUrl = window.location.href;
 
         // Extract parameters from the current URL
         const parameters = getUrlParameters(currentUrl);
 
-        // Log the extracted parameters to the console
-        console.log("Extracted Parameters:", parameters);
+        // Log the extracted parameters for verification
+        console.log("Extracted Parameters (for verification):", parameters);
 
-        // Example: Log individual parameters (if any)
-        for (const [key, value] of Object.entries(parameters)) {
-            console.log(`${key}: ${value}`);
+        // Verify parameters exist before sending
+        if (Object.keys(parameters).length === 0) {
+            console.warn("No URL parameters found. Skipping webhook call.");
+        } else {
+            // Log the verification step
+            console.log("Verified Parameters. Proceeding to send to webhook...");
+
+            // Define your Zapier webhook URL
+            const webhookUrl = "https://hooks.zapier.com/hooks/catch/16414363/2k229v1/";
+
+            // Send the parameters to the Zapier webhook
+            sendToWebhook(webhookUrl, parameters);
         }
     </script>
 </body>
