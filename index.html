@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send URL Parameters to Zapier</title>
+    <title>Extract Canonical URL Parameters</title>
 </head>
 <body>
     <script>
@@ -53,27 +53,35 @@
             }
         }
 
-        // Get the current URL dynamically (for the widget)
-        const currentUrl = window.location.href;
+        // Extract the URL from the <link rel="canonical"> tag
+        const canonicalTag = document.querySelector('link[rel="canonical"]');
+        if (canonicalTag && canonicalTag.href) {
+            const canonicalUrl = canonicalTag.href;
 
-        // Extract parameters from the current URL
-        const parameters = getUrlParameters(currentUrl);
+            // Log the full canonical URL for verification
+            console.log("Canonical URL (from <link rel='canonical'> tag):", canonicalUrl);
 
-        // Log the extracted parameters for verification
-        console.log("Extracted Parameters (for verification):", parameters);
+            // Extract parameters from the canonical URL
+            const parameters = getUrlParameters(canonicalUrl);
 
-        // Verify parameters exist before sending
-        if (Object.keys(parameters).length === 0) {
-            console.warn("No URL parameters found. Skipping webhook call.");
+            // Log the extracted parameters for verification
+            console.log("Extracted Parameters (from Canonical URL):", parameters);
+
+            // Verify parameters exist before sending
+            if (Object.keys(parameters).length === 0) {
+                console.warn("No URL parameters found in the canonical URL. Skipping webhook call.");
+            } else {
+                // Log the verification step
+                console.log("Verified Parameters. Proceeding to send to webhook...");
+
+                // Define your Zapier webhook URL
+                const webhookUrl = "https://hooks.zapier.com/hooks/catch/16414363/2k229v1/";
+
+                // Send the parameters to the Zapier webhook
+                sendToWebhook(webhookUrl, parameters);
+            }
         } else {
-            // Log the verification step
-            console.log("Verified Parameters. Proceeding to send to webhook...");
-
-            // Define your Zapier webhook URL
-            const webhookUrl = "https://hooks.zapier.com/hooks/catch/16414363/2k229v1/";
-
-            // Send the parameters to the Zapier webhook
-            sendToWebhook(webhookUrl, parameters);
+            console.error("No <link rel='canonical'> tag found on the page.");
         }
     </script>
 </body>
