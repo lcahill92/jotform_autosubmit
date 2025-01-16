@@ -6,76 +6,40 @@
     <body>
         <div id="main">
             <h3>My Widget</h3>
-            <p>Enter values in the fields below:</p>
-            <label for="userInput1">Field 1:</label>
-            <input type="text" id="userInput1" placeholder="Enter first value">
-            <br><br>
-            <label for="userInput2">Field 2:</label>
-            <input type="text" id="userInput2" placeholder="Enter second value">
-            <br><br>
-            <!-- Example hidden field inside the widget -->
-            <input id="input_122" class="form-hidden form-widget" type="hidden" name="q122_typeA" value="test@test.com">
+            <p>Fetching values from widget inputs...</p>
         </div>
         <script type="text/javascript">
-            // Function to log all input fields in the widget for debugging
-            function logAllInputs() {
-                const inputs = document.querySelectorAll("input");
-                console.log("All input fields in the widget:", inputs);
-            }
+            // Function to log all hidden input values from the widget
+            function logHiddenFieldValues() {
+                // Select all hidden inputs within the widget-inputs-wrapper div
+                const hiddenInputs = document.querySelectorAll('.widget-inputs-wrapper input[type="hidden"]');
 
-            // Function to retry locating the hidden field
-            function waitForField(selector, callback, attempts = 20) {
-                const hiddenField = document.querySelector(selector);
-                if (hiddenField) {
-                    callback(hiddenField);
-                } else if (attempts > 0) {
-                    console.warn(`Hidden field not found. Retrying... (${20 - attempts + 1})`);
-                    setTimeout(() => waitForField(selector, callback, attempts - 1), 200);
+                if (hiddenInputs.length > 0) {
+                    console.log("Hidden field values:");
+                    hiddenInputs.forEach((input) => {
+                        console.log(`Name: ${input.name}, Value: ${input.value}`);
+                    });
                 } else {
-                    console.error(`Hidden field with selector "${selector}" not found after multiple attempts.`);
-                    logAllInputs(); // Log all inputs for debugging
+                    console.warn("No hidden inputs found in the widget-inputs-wrapper.");
                 }
-            }
-
-            // Function to locate and log the value of the hidden input field
-            function findAndLogHiddenFieldValue(qid, fieldName) {
-                // Construct the selector dynamically using qid and fieldName
-                const hiddenFieldSelector = `input[name="q${qid}_${fieldName}"]`;
-                console.log(`Looking for hidden field with selector: "${hiddenFieldSelector}"`);
-                waitForField(hiddenFieldSelector, (hiddenField) => {
-                    console.log(`Value of the hidden field "q${qid}_${fieldName}":`, hiddenField.value);
-                });
             }
 
             // Always subscribe to the ready event
             JFCustomWidget.subscribe("ready", function () {
-                const settings = JFCustomWidget.getWidgetSettings();
-                console.log("Widget settings:", settings);
-
-                const qid = settings.qid; // Fetch qid from settings
-                const field1 = settings.field1; // Fetch field name suffix
-
-                if (qid && field1) {
-                    findAndLogHiddenFieldValue(qid, field1);
-                } else {
-                    if (!qid) console.error("QID is not defined in the widget settings.");
-                    if (!field1) console.error("Field1 is not defined in the widget settings.");
-                }
+                console.log("Widget is ready. Fetching hidden field values...");
+                logHiddenFieldValues();
 
                 // Subscribe to the form submit event
                 JFCustomWidget.subscribe("submit", function () {
-                    const value1 = document.getElementById("userInput1").value;
-                    const value2 = document.getElementById("userInput2").value;
+                    // Optionally, re-fetch the values on submission
+                    console.log("Form is being submitted. Re-fetching hidden field values...");
+                    logHiddenFieldValues();
 
+                    // Send dummy data as a placeholder (replace or extend as needed)
                     const msg = {
                         valid: true,
-                        value: {
-                            field1: value1,
-                            field2: value2,
-                        },
+                        value: { exampleKey: "exampleValue" },
                     };
-
-                    console.log("Submitting data:", msg);
                     JFCustomWidget.sendSubmit(msg);
                 });
             });
