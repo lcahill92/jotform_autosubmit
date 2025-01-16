@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log Fields Example</title>
+    <title>Dynamic Widget Example</title>
 </head>
 <body>
-    <h1>Log Fields Example</h1>
-    <p>This form will log all field names and values to the console after 2 seconds.</p>
+    <h1>Dynamic Widget Example</h1>
+    <p>This widget will log data passed from the parent form and display fields dynamically.</p>
 
     <form id="dynamicForm">
         <!-- Dynamic fields will be appended here -->
@@ -16,33 +16,34 @@
     <button id="submitBtn">Submit Form</button>
 
     <script>
-        // Function to dynamically create exactly 5 form fields
-        function setupFormFields() {
+        // Function to dynamically create fields based on data from the form
+        function setupFormFields(fields) {
             const formElement = document.getElementById('dynamicForm');
 
             // Clear any existing fields
             formElement.innerHTML = '';
 
-            // Create 5 dynamic fields
-            for (let i = 1; i <= 5; i++) {
+            // Create fields dynamically based on received data
+            fields.forEach((field, index) => {
                 const fieldWrapper = document.createElement('div');
                 fieldWrapper.style.marginBottom = '10px';
 
                 const label = document.createElement('label');
-                label.textContent = `Field ${i}: `;
-                label.setAttribute('for', `field_${i}`);
+                label.textContent = `${field.label || `Field ${index + 1}`}: `;
+                label.setAttribute('for', `field_${index + 1}`);
 
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.id = `field_${i}`;
-                input.name = `field_${i}`;
-                input.placeholder = `Placeholder Field ${i}`;
+                input.id = `field_${index + 1}`;
+                input.name = field.name || `field_${index + 1}`;
+                input.value = field.value || ''; // Pre-fill value if provided
+                input.placeholder = field.placeholder || `Placeholder Field ${index + 1}`;
 
                 fieldWrapper.appendChild(label);
                 fieldWrapper.appendChild(input);
 
                 formElement.appendChild(fieldWrapper);
-            }
+            });
         }
 
         // Function to log all field names and values to the console
@@ -55,25 +56,42 @@
                 fields[input.name] = input.value;
             });
 
-            console.log('Field values after 2 seconds:', fields);
+            console.log('Field values:', fields);
         }
 
-        // Wait for 2 seconds and log all fields
-        function logFieldsAfterDelay() {
-            setTimeout(logAllFields, 2000);
-        }
+        // Event listener to handle messages from the parent form
+        window.addEventListener('message', (event) => {
+            // Ensure the message comes from the expected origin (for security)
+            if (!event.origin.includes('jotform.com')) {
+                console.warn('Message from unauthorized origin:', event.origin);
+                return;
+            }
 
-        // Set up the form fields on page load
-        setupFormFields();
+            const data = event.data;
 
-        // Log the fields after a 2-second delay
-        logFieldsAfterDelay();
+            // Check if data contains fields information
+            if (data.fields) {
+                console.log('Received fields from parent form:', data.fields);
 
-        // Add event listener to the submit button to prevent submission
+                // Set up the form fields dynamically
+                setupFormFields(data.fields);
+
+                // Log fields after 2 seconds (for demonstration)
+                setTimeout(logAllFields, 2000);
+            } else {
+                console.warn('No fields data received from parent form.');
+            }
+        });
+
+        // Simulate submission for testing
         document.getElementById('submitBtn').addEventListener('click', (event) => {
             event.preventDefault();
             console.log('Submit button clicked!');
+            logAllFields();
         });
+
+        // Example of sending a "ready" message to the parent form
+        window.parent.postMessage({ event: 'widgetReady' }, '*');
     </script>
 </body>
 </html>
