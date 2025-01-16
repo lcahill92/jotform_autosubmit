@@ -3,49 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook Example</title>
+    <title>Dynamic Fields Example</title>
 </head>
 <body>
-    <h1>Webhook Automation</h1>
-    <p>Webhook will be sent in 2 seconds. Check the console for details.</p>
+    <h1>Dynamic Form Fields Example</h1>
+    <p>The form fields will be dynamically generated based on the widget settings.</p>
+
+    <form id="dynamicForm">
+        <!-- Dynamic fields will be appended here -->
+    </form>
+
+    <button id="submitBtn">Submit Form</button>
 
     <script>
-        // Webhook URL
-        const webhookUrl = "https://hooks.zapier.com/hooks/catch/16414363/2k229v1/";
-
-        // Payload to send
-        const payload = {
-            status: "success",
-            message: "Webhook triggered successfully!",
-            timestamp: new Date().toISOString()
-        };
-
-        // Function to send the webhook
-        const sendWebhook = async () => {
-            try {
-                console.log("Preparing to send webhook...");
-                const response = await fetch(webhookUrl, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    console.log("Webhook sent successfully:", await response.json());
-                } else {
-                    console.error("Failed to send webhook. Status:", response.status);
-                }
-            } catch (error) {
-                console.error("Error sending webhook:", error);
+        // Function to retrieve settings from the widget
+        function getWidgetSettings() {
+            const widgetSettingsElement = document.getElementById('widget_settings');
+            if (widgetSettingsElement) {
+                const settings = JSON.parse(decodeURIComponent(widgetSettingsElement.value));
+                const settingsMap = settings.reduce((map, setting) => {
+                    map[setting.name] = setting.value;
+                    return map;
+                }, {});
+                return settingsMap;
             }
-        };
+            return null;
+        }
 
-        // Wait for 2 seconds and then send the webhook
-        setTimeout(() => {
-            sendWebhook();
-        }, 2000);
+        // Function to dynamically create form fields based on widget settings
+        function setupFormFields() {
+            const settings = getWidgetSettings();
+            const formElement = document.getElementById('dynamicForm');
+
+            if (!settings || !settings.numFields) {
+                console.error('Number of fields not found in widget settings');
+                return;
+            }
+
+            const numFields = parseInt(settings.numFields, 10);
+
+            // Clear any existing fields
+            formElement.innerHTML = '';
+
+            // Create dynamic fields
+            for (let i = 1; i <= numFields; i++) {
+                const fieldWrapper = document.createElement('div');
+                fieldWrapper.style.marginBottom = '10px';
+
+                const label = document.createElement('label');
+                label.textContent = `Field ${i}: `;
+                label.setAttribute('for', `field_${i}`);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `field_${i}`;
+                input.name = `field_${i}`;
+                input.placeholder = `Enter value for Field ${i}`;
+
+                fieldWrapper.appendChild(label);
+                fieldWrapper.appendChild(input);
+
+                formElement.appendChild(fieldWrapper);
+            }
+        }
+
+        // Function to programmatically submit the form
+        function autoSubmitForm() {
+            const settings = getWidgetSettings();
+            if (!settings || !settings.apiKey || !settings.formId) {
+                console.error('API Key or Form ID not found in widget settings');
+                return;
+            }
+
+            const apiKey = settings.apiKey;
+            const formId = settings.formId;
+
+            // Collect field values
+            const formData = new URLSearchParams();
+            const fields = document.querySelectorAll('#dynamicForm input');
+            fields.forEach((field) => {
+                formData.append(field.name, field.value);
+            });
+
+            // Form action URL
+            const actionUrl = `https://api.jotform.com/form/${formId}/submissions`;
+
+            // Send POST request
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'APIKEY': apiKey
+                },
+                body: formData.toString(),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        console.log('Form submitted successfully:', response);
+                    } else {
+                        console.error('Error submitting form:', response.status, response.statusText);
+                    }
+                })
+                .catch((error) => console.error('Error submitting form:', error));
+        }
+
+        // Setup form fields on page load
+        setupFormFields();
+
+        // Add event listener to the submit button
+        document.getElementById('submitBtn').addEventListener('click', (event) => {
+            event.preventDefault();
+            autoSubmitForm();
+        });
     </script>
+
+    <!-- Hidden element to simulate widget settings -->
+    <input id="widget_settings" type="hidden" value="%5B%7B%22name%22%3A%22apiKey%22%2C%22value%22%3A%22YOUR_API_KEY_HERE%22%7D%2C%7B%22name%22%3A%22formId%22%2C%22value%22%3A%22YOUR_FORM_ID_HERE%22%7D%2C%7B%22name%22%3A%22numFields%22%2C%22value%22%3A%223%22%7D%5D">
 </body>
 </html>
