@@ -45,43 +45,12 @@
             }
         }
 
-        // Function to programmatically submit the form
-        function autoSubmitForm() {
-            const apiKey = "YOUR_API_KEY_HERE"; // Replace with actual API key
-            const formId = "YOUR_FORM_ID_HERE"; // Replace with actual Form ID
-
-            if (!apiKey || !formId) {
-                console.error('API Key or Form ID not provided');
-                return;
-            }
-
-            // Collect field values
-            const formData = new URLSearchParams();
+        // Function to log field names and values to the console
+        function logFieldValues() {
             const fields = document.querySelectorAll('#dynamicForm input');
             fields.forEach((field) => {
-                formData.append(field.name, field.value);
+                console.log(`${field.name}: ${field.value}`);
             });
-
-            // Form action URL
-            const actionUrl = `https://api.jotform.com/form/${formId}/submissions`;
-
-            // Send POST request
-            fetch(actionUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'APIKEY': apiKey
-                },
-                body: formData.toString(),
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        console.log('Form submitted successfully:', response);
-                    } else {
-                        console.error('Error submitting form:', response.status, response.statusText);
-                    }
-                })
-                .catch((error) => console.error('Error submitting form:', error));
         }
 
         // Setup form fields on page load
@@ -90,7 +59,7 @@
         // Add event listener to the submit button
         document.getElementById('submitBtn').addEventListener('click', (event) => {
             event.preventDefault();
-            autoSubmitForm();
+            logFieldValues(); // Log field values to the console
         });
     </script>
 </body>
