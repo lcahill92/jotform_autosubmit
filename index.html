@@ -3,86 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extract Canonical URL Parameters</title>
+    <title>Fetch Canonical URL</title>
 </head>
 <body>
     <script>
         /**
-         * Function to extract key-value pairs from a URL
-         * @param {string} url - The URL to extract parameters from
-         * @returns {object} - An object containing key-value pairs
+         * Fetches the canonical URL and logs it to the console.
          */
-        function getUrlParameters(url) {
-            const params = {};
-            
-            // Parse the URL and extract the query string
-            const urlObject = new URL(url);
-            const queryString = urlObject.search;
-            
-            // Use URLSearchParams to iterate over the parameters
-            const urlParams = new URLSearchParams(queryString);
-            urlParams.forEach((value, key) => {
-                params[key] = value;
-            });
-            
-            return params;
-        }
+        function logCanonicalUrl() {
+            let canonicalUrl = null;
 
-        /**
-         * Function to send data to a webhook
-         * @param {string} webhookUrl - The webhook URL
-         * @param {object} data - The data to send
-         */
-        async function sendToWebhook(webhookUrl, data) {
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    console.log("Data successfully sent to the webhook:", await response.json());
-                } else {
-                    console.error("Error sending data to the webhook:", response.status, response.statusText);
-                }
-            } catch (error) {
-                console.error("Network error:", error);
-            }
-        }
-
-        // Extract the URL from the <link rel="canonical"> tag
-        const canonicalTag = document.querySelector('link[rel="canonical"]');
-        if (canonicalTag && canonicalTag.href) {
-            const canonicalUrl = canonicalTag.href;
-
-            // Log the full canonical URL for verification
-            console.log("Canonical URL (from <link rel='canonical'> tag):", canonicalUrl);
-
-            // Extract parameters from the canonical URL
-            const parameters = getUrlParameters(canonicalUrl);
-
-            // Log the extracted parameters for verification
-            console.log("Extracted Parameters (from Canonical URL):", parameters);
-
-            // Verify parameters exist before sending
-            if (Object.keys(parameters).length === 0) {
-                console.warn("No URL parameters found in the canonical URL. Skipping webhook call.");
+            // Attempt to fetch the canonical URL from the <link rel="canonical"> tag
+            const canonicalTag = document.querySelector('link[rel="canonical"]');
+            if (canonicalTag && canonicalTag.href) {
+                canonicalUrl = canonicalTag.href;
+                console.log("Canonical URL found in <link rel='canonical'> tag:", canonicalUrl);
             } else {
-                // Log the verification step
-                console.log("Verified Parameters. Proceeding to send to webhook...");
-
-                // Define your Zapier webhook URL
-                const webhookUrl = "https://hooks.zapier.com/hooks/catch/16414363/2k229v1/";
-
-                // Send the parameters to the Zapier webhook
-                sendToWebhook(webhookUrl, parameters);
+                console.warn("No <link rel='canonical'> tag found. Trying alternative methods.");
             }
-        } else {
-            console.error("No <link rel='canonical'> tag found on the page.");
+
+            // If no canonical URL is found, log a fallback message
+            if (!canonicalUrl) {
+                canonicalUrl = document.location.href;
+                console.log("Fallback: Using document.location.href as the URL:", canonicalUrl);
+            }
+
+            // Log the final canonical URL to the console
+            console.log("Final Canonical URL:", canonicalUrl);
         }
+
+        // Execute the function to log the canonical URL on page load
+        window.onload = logCanonicalUrl;
     </script>
 </body>
 </html>
