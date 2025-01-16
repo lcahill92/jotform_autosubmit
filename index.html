@@ -3,95 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Widget Example</title>
+    <title>Jotform Widget</title>
 </head>
 <body>
-    <h1>Dynamic Widget Example</h1>
-    <p>This widget will log data passed from the parent form and display fields dynamically.</p>
+    <h1>Custom Jotform Widget</h1>
+    <p>This widget dynamically generates 5 fields and logs their values and widget settings to the console.</p>
 
-    <form id="dynamicForm">
-        <!-- Dynamic fields will be appended here -->
+    <form id="widgetForm">
+        <!-- Fields will be dynamically generated here -->
     </form>
 
-    <button id="submitBtn">Submit Form</button>
-
     <script>
-        // Function to dynamically create fields based on data from the form
-        function setupFormFields(fields) {
-            const formElement = document.getElementById('dynamicForm');
+        // Function to retrieve widget settings
+        function getWidgetSettings() {
+            const widgetSettingsElement = document.getElementById('widget_settings');
+            if (widgetSettingsElement) {
+                const settings = JSON.parse(decodeURIComponent(widgetSettingsElement.value));
+                const settingsMap = settings.reduce((map, setting) => {
+                    map[setting.name] = setting.value;
+                    return map;
+                }, {});
+                console.log('Widget Settings:', settingsMap); // Log widget settings to the console
+                return settingsMap;
+            }
+            console.warn('No widget settings found.');
+            return null;
+        }
 
-            // Clear any existing fields
-            formElement.innerHTML = '';
+        // Function to dynamically generate fields
+        function generateFields() {
+            const formElement = document.getElementById('widgetForm');
+            formElement.innerHTML = ''; // Clear any existing fields
 
-            // Create fields dynamically based on received data
-            fields.forEach((field, index) => {
+            // Create 5 dynamic fields
+            for (let i = 1; i <= 5; i++) {
                 const fieldWrapper = document.createElement('div');
                 fieldWrapper.style.marginBottom = '10px';
 
                 const label = document.createElement('label');
-                label.textContent = `${field.label || `Field ${index + 1}`}: `;
-                label.setAttribute('for', `field_${index + 1}`);
+                label.setAttribute('for', `field${i}`);
+                label.innerText = `Placeholder Field ${i}:`;
 
                 const input = document.createElement('input');
-                input.type = 'text';
-                input.id = `field_${index + 1}`;
-                input.name = field.name || `field_${index + 1}`;
-                input.value = field.value || ''; // Pre-fill value if provided
-                input.placeholder = field.placeholder || `Placeholder Field ${index + 1}`;
+                input.setAttribute('type', 'text');
+                input.setAttribute('id', `field${i}`);
+                input.setAttribute('name', `field${i}`);
+                input.setAttribute('placeholder', `Placeholder Field ${i}`);
+                input.style.width = '100%';
 
                 fieldWrapper.appendChild(label);
                 fieldWrapper.appendChild(input);
-
                 formElement.appendChild(fieldWrapper);
-            });
-        }
-
-        // Function to log all field names and values to the console
-        function logAllFields() {
-            const formElement = document.getElementById('dynamicForm');
-            const inputs = formElement.querySelectorAll('input');
-            const fields = {};
-
-            inputs.forEach((input) => {
-                fields[input.name] = input.value;
-            });
-
-            console.log('Field values:', fields);
-        }
-
-        // Event listener to handle messages from the parent form
-        window.addEventListener('message', (event) => {
-            // Ensure the message comes from the expected origin (for security)
-            if (!event.origin.includes('jotform.com')) {
-                console.warn('Message from unauthorized origin:', event.origin);
-                return;
             }
 
-            const data = event.data;
+            console.log('Fields have been dynamically created.');
+        }
 
-            // Check if data contains fields information
-            if (data.fields) {
-                console.log('Received fields from parent form:', data.fields);
+        // Function to log all field values and widget settings
+        function logFieldValuesAndSettings() {
+            // Log the widget settings
+            const settings = getWidgetSettings();
 
-                // Set up the form fields dynamically
-                setupFormFields(data.fields);
+            // Log the front-end fields and their values
+            const formElement = document.getElementById('widgetForm');
+            const fieldValues = {};
+            Array.from(formElement.elements).forEach(field => {
+                if (field.name) {
+                    fieldValues[field.name] = field.value || 'Empty';
+                }
+            });
+            console.log('Front-End Fields and Values:', fieldValues);
+        }
 
-                // Log fields after 2 seconds (for demonstration)
-                setTimeout(logAllFields, 2000);
-            } else {
-                console.warn('No fields data received from parent form.');
-            }
-        });
+        // Initialize widget
+        function initializeWidget() {
+            // Generate fields dynamically
+            generateFields();
 
-        // Simulate submission for testing
-        document.getElementById('submitBtn').addEventListener('click', (event) => {
-            event.preventDefault();
-            console.log('Submit button clicked!');
-            logAllFields();
-        });
+            // Log field values and widget settings after 2 seconds
+            setTimeout(logFieldValuesAndSettings, 2000);
+        }
 
-        // Example of sending a "ready" message to the parent form
-        window.parent.postMessage({ event: 'widgetReady' }, '*');
+        // Simulate widget settings input
+        const widgetSettings = [
+            { name: 'apiKey', value: 'YOUR_API_KEY_HERE' },
+            { name: 'formId', value: 'YOUR_FORM_ID_HERE' },
+            { name: 'field1', value: 'Field 1 Setting' },
+            { name: 'field2', value: 'Field 2 Setting' },
+        ];
+        const widgetSettingsElement = document.createElement('input');
+        widgetSettingsElement.setAttribute('type', 'hidden');
+        widgetSettingsElement.setAttribute('id', 'widget_settings');
+        widgetSettingsElement.value = encodeURIComponent(JSON.stringify(widgetSettings));
+        document.body.appendChild(widgetSettingsElement);
+
+        // Initialize the widget
+        initializeWidget();
     </script>
 </body>
 </html>
