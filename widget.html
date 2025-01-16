@@ -6,7 +6,7 @@
     <body>
         <div id="main">
             <h3>My Widget</h3>
-            <p>Enter values in the fields below:</p>
+            <p>Enter values in the field ns below:</p>
             <label for="userInput1">Field 1:</label>
             <input type="text" id="userInput1" placeholder="Enter first value">
             <br><br>
@@ -17,7 +17,7 @@
             // Function to locate and log the value of the hidden input field
             function findAndLogHiddenFieldValue(fieldName) {
                 // Construct the selector dynamically based on the widget setting (field1)
-                const hiddenFieldSelector = `input[name="q100_${fieldName}"]`; // Adjust prefix if necessary
+                const hiddenFieldSelector = `input[name="q140_${fieldName}"]`; // Adjust prefix if necessary
                 const hiddenField = document.querySelector(hiddenFieldSelector);
 
                 if (hiddenField) {
