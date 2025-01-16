@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Dynamic Form Fields Example</h1>
-    <p>The form fields will be dynamically generated based on the `field1` widget setting.</p>
+    <p>This form has 5 placeholder fields dynamically generated.</p>
 
     <form id="dynamicForm">
         <!-- Dynamic fields will be appended here -->
@@ -16,37 +16,15 @@
     <button id="submitBtn">Submit Form</button>
 
     <script>
-        // Function to retrieve settings from the widget
-        function getWidgetSettings() {
-            const widgetSettingsElement = document.getElementById('widget_settings');
-            if (widgetSettingsElement) {
-                const settings = JSON.parse(decodeURIComponent(widgetSettingsElement.value));
-                const settingsMap = settings.reduce((map, setting) => {
-                    map[setting.name] = setting.value;
-                    return map;
-                }, {});
-                return settingsMap;
-            }
-            return null;
-        }
-
-        // Function to dynamically create form fields based on `field1` widget setting
+        // Function to dynamically create exactly 5 form fields
         function setupFormFields() {
-            const settings = getWidgetSettings();
             const formElement = document.getElementById('dynamicForm');
-
-            if (!settings || !settings.field1) {
-                console.error('Field1 value not found in widget settings');
-                return;
-            }
-
-            const numFields = parseInt(settings.field1, 10);
 
             // Clear any existing fields
             formElement.innerHTML = '';
 
-            // Create dynamic fields
-            for (let i = 1; i <= numFields; i++) {
+            // Create 5 dynamic fields
+            for (let i = 1; i <= 5; i++) {
                 const fieldWrapper = document.createElement('div');
                 fieldWrapper.style.marginBottom = '10px';
 
@@ -58,7 +36,7 @@
                 input.type = 'text';
                 input.id = `field_${i}`;
                 input.name = `field_${i}`;
-                input.placeholder = `Enter value for Field ${i}`;
+                input.placeholder = `Placeholder Field ${i}`;
 
                 fieldWrapper.appendChild(label);
                 fieldWrapper.appendChild(input);
@@ -69,14 +47,13 @@
 
         // Function to programmatically submit the form
         function autoSubmitForm() {
-            const settings = getWidgetSettings();
-            if (!settings || !settings.apiKey || !settings.formId) {
-                console.error('API Key or Form ID not found in widget settings');
+            const apiKey = "YOUR_API_KEY_HERE"; // Replace with actual API key
+            const formId = "YOUR_FORM_ID_HERE"; // Replace with actual Form ID
+
+            if (!apiKey || !formId) {
+                console.error('API Key or Form ID not provided');
                 return;
             }
-
-            const apiKey = settings.apiKey;
-            const formId = settings.formId;
 
             // Collect field values
             const formData = new URLSearchParams();
@@ -116,8 +93,5 @@
             autoSubmitForm();
         });
     </script>
-
-    <!-- Hidden element to simulate widget settings -->
-    <input id="widget_settings" type="hidden" value="%5B%7B%22name%22%3A%22apiKey%22%2C%22value%22%3A%22YOUR_API_KEY_HERE%22%7D%2C%7B%22name%22%3A%22formId%22%2C%22value%22%3A%22YOUR_FORM_ID_HERE%22%7D%2C%7B%22name%22%3A%22field1%22%2C%22value%22%3A%223%22%7D%5D">
 </body>
 </html>
