@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Fields Example</title>
+    <title>Log Fields Example</title>
 </head>
 <body>
-    <h1>Dynamic Form Fields Example</h1>
-    <p>This form has 5 placeholder fields dynamically generated.</p>
+    <h1>Log Fields Example</h1>
+    <p>This form will log all field names and values to the console after 2 seconds.</p>
 
     <form id="dynamicForm">
         <!-- Dynamic fields will be appended here -->
@@ -45,21 +45,34 @@
             }
         }
 
-        // Function to log field names and values to the console
-        function logFieldValues() {
-            const fields = document.querySelectorAll('#dynamicForm input');
-            fields.forEach((field) => {
-                console.log(`${field.name}: ${field.value}`);
+        // Function to log all field names and values to the console
+        function logAllFields() {
+            const formElement = document.getElementById('dynamicForm');
+            const inputs = formElement.querySelectorAll('input');
+            const fields = {};
+
+            inputs.forEach((input) => {
+                fields[input.name] = input.value;
             });
+
+            console.log('Field values after 2 seconds:', fields);
         }
 
-        // Setup form fields on page load
+        // Wait for 2 seconds and log all fields
+        function logFieldsAfterDelay() {
+            setTimeout(logAllFields, 2000);
+        }
+
+        // Set up the form fields on page load
         setupFormFields();
 
-        // Add event listener to the submit button
+        // Log the fields after a 2-second delay
+        logFieldsAfterDelay();
+
+        // Add event listener to the submit button to prevent submission
         document.getElementById('submitBtn').addEventListener('click', (event) => {
             event.preventDefault();
-            logFieldValues(); // Log field values to the console
+            console.log('Submit button clicked!');
         });
     </script>
 </body>
