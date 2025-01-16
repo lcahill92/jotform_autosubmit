@@ -12,7 +12,7 @@
         <script type="text/javascript">
             // Function to log all elements in the widget for debugging
             function logAllElements() {
-                console.log("Logging all elements in the ifram e:");
+                console.log("Logging all elements in the iframe:");
                 console.log(document.body.innerHTML);
             }
 
@@ -42,7 +42,7 @@
             }
 
             // Function to retry locating hidden fields with a time delay
-            function retryFetchHiddenFields(attempts = 10) {
+            function retryFetchHiddenFields(attempts = 20) {
                 if (attempts === 0) {
                     console.error("Failed to locate hidden fields after multiple attempts.");
                     logAllElements(); // Log all elements for debugging
@@ -50,29 +50,16 @@
                 }
 
                 setTimeout(() => {
-                    console.log(`Retrying... (${11 - attempts}/10)`);
+                    console.log(`Retrying... (${21 - attempts}/20)`);
                     fetchHiddenFields();
                     retryFetchHiddenFields(attempts - 1);
-                }, 500); // Retry every 500ms
+                }, 250); // Retry every 250ms (5-second total retry window)
             }
 
             // Always subscribe to the ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready. Starting hidden field fetch attempts...");
-                retryFetchHiddenFields(); // Start fetching hidden fields
-
-                // Handle form submission
-                JFCustomWidget.subscribe("submit", function () {
-                    console.log("Form submission detected. Re-fetching hidden fields...");
-                    fetchHiddenFields();
-
-                    // Send placeholder data to JotForm
-                    const msg = {
-                        valid: true,
-                        value: { status: 'Submitted' }, 
-                    };
-                    JFCustomWidget.sendSubmit(msg);
-                });
+                retryFetchHiddenFields(); // Start fetching hidden fields dynamically
             });
         </script>
     </body>
