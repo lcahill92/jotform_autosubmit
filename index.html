@@ -1,104 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jotform Widget</title>
+    <link rel="stylesheet" href="widget.css">
 </head>
 <body>
-    <h1>Custom Jotform Widget</h1>
-    <p>This widget dynamically generates 5 fields and logs their values and widget settings to the console.</p>
-
-    <form id="widgetForm">
-        <!-- Fields will be dynamically generated here -->
-    </form>
-
-    <script>
-        // Function to retrieve widget settings
-        function getWidgetSettings() {
-            const widgetSettingsElement = document.getElementById('widget_settings');
-            if (widgetSettingsElement) {
-                const settings = JSON.parse(decodeURIComponent(widgetSettingsElement.value));
-                const settingsMap = settings.reduce((map, setting) => {
-                    map[setting.name] = setting.value;
-                    return map;
-                }, {});
-                console.log('Widget Settings:', settingsMap); // Log widget settings to the console
-                return settingsMap;
-            }
-            console.warn('No widget settings found.');
-            return null;
-        }
-
-        // Function to dynamically generate fields
-        function generateFields() {
-            const formElement = document.getElementById('widgetForm');
-            formElement.innerHTML = ''; // Clear any existing fields
-
-            // Create 5 dynamic fields
-            for (let i = 1; i <= 5; i++) {
-                const fieldWrapper = document.createElement('div');
-                fieldWrapper.style.marginBottom = '10px';
-
-                const label = document.createElement('label');
-                label.setAttribute('for', `field${i}`);
-                label.innerText = `Placeholder Field ${i}:`;
-
-                const input = document.createElement('input');
-                input.setAttribute('type', 'text');
-                input.setAttribute('id', `field${i}`);
-                input.setAttribute('name', `field${i}`);
-                input.setAttribute('placeholder', `Placeholder Field ${i}`);
-                input.style.width = '100%';
-
-                fieldWrapper.appendChild(label);
-                fieldWrapper.appendChild(input);
-                formElement.appendChild(fieldWrapper);
-            }
-
-            console.log('Fields have been dynamically created.');
-        }
-
-        // Function to log all field values and widget settings
-        function logFieldValuesAndSettings() {
-            // Log the widget settings
-            const settings = getWidgetSettings();
-
-            // Log the front-end fields and their values
-            const formElement = document.getElementById('widgetForm');
-            const fieldValues = {};
-            Array.from(formElement.elements).forEach(field => {
-                if (field.name) {
-                    fieldValues[field.name] = field.value || 'Empty';
-                }
-            });
-            console.log('Front-End Fields and Values:', fieldValues);
-        }
-
-        // Initialize widget
-        function initializeWidget() {
-            // Generate fields dynamically
-            generateFields();
-
-            // Log field values and widget settings after 2 seconds
-            setTimeout(logFieldValuesAndSettings, 2000);
-        }
-
-        // Simulate widget settings input
-        const widgetSettings = [
-            { name: 'apiKey', value: 'YOUR_API_KEY_HERE' },
-            { name: 'formId', value: '250137186711049' },
-            { name: 'field1', value: 'Field 1 Setting' },
-            { name: 'field2', value: 'Field 2 Setting' },
-        ];
-        const widgetSettingsElement = document.createElement('input');
-        widgetSettingsElement.setAttribute('type', 'hidden');
-        widgetSettingsElement.setAttribute('id', 'widget_settings');
-        widgetSettingsElement.value = encodeURIComponent(JSON.stringify(widgetSettings));
-        document.body.appendChild(widgetSettingsElement);
-
-        // Initialize the widget
-        initializeWidget();
-    </script>
+    <div id="widget-container">
+        <label for="custom-input">Enter your value:</label>
+        <input type="text" id="custom-input" name="custom-input" placeholder="Type something...">
+    </div>
 </body>
 </html>
