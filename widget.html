@@ -33,11 +33,11 @@
                 console.log("Widget settings:", settings);
 
                 // Fetch the value of field1 from the settings
-                const field1 = settings.field1;
-                if (field1) {
+                const field1 = settings.Field1;
+                if (Field1) {
                     console.log(`Looking for hidden field with ID: ${field1}`);
                     // Locate and log the value of the hidden input field
-                    findAndLogHiddenFieldValueById(field1);
+                    findAndLogHiddenFieldValueById(Field1);
                 } else {
                     console.error("field1 is not defined in the widget settings.");
                 }
