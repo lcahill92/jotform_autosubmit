@@ -10,38 +10,60 @@
             <div id="hidden-values-output"></div>
         </div>
         <script type="text/javascript">
-            // Function to fetch and log hidden field values
-            function fetchAndLogHiddenFields() {
-                // Locate the widget-inputs-wrapper div
+            // Function to log all hidden fields in the widget-inputs-wrapper
+            function logHiddenFields() {
                 const wrapper = document.querySelector('.widget-inputs-wrapper');
 
                 if (wrapper) {
-                    // Find all hidden inputs inside the wrapper
-                    const hiddenFields = wrapper.querySelectorAll('input[type="hidden"]');
-                    const hiddenValues = Array.from(hiddenFields).map(input => ({
-                        name: input.name,
-                        value: input.value,
-                    }));
+                    const hiddenInputs = wrapper.querySelectorAll('input[type="hidden"]');
+                    if (hiddenInputs.length > 0) {
+                        const hiddenValues = Array.from(hiddenInputs).map(input => ({
+                            name: input.name,
+                            value: input.value,
+                        }));
+                        console.log("Hidden field values:", hiddenValues);
 
-                    console.log("Hidden field values:", hiddenValues);
-
-                    // Display the values in the widget
-                    const outputDiv = document.getElementById('hidden-values-output');
-                    outputDiv.innerHTML = `<pre>${JSON.stringify(hiddenValues, null, 2)}</pre>`;
+                        // Display the values in the widget
+                        const outputDiv = document.getElementById('hidden-values-output');
+                        outputDiv.innerHTML = `<pre>${JSON.stringify(hiddenValues, null, 2)}</pre>`;
+                    } else {
+                        console.warn("No hidden fields found inside .widget-inputs-wrapper.");
+                    }
                 } else {
-                    console.warn("No .widget-inputs-wrapper found in the widget DOM.");
+                    console.warn(".widget-inputs-wrapper not found in the DOM.");
                 }
             }
 
-            // Always subscribe to the ready event
-            JFCustomWidget.subscribe('ready', function () {
-                console.log("Widget is ready. Fetching hidden field values...");
-                fetchAndLogHiddenFields();
+            // Function to wait for dynamic DOM changes using MutationObserver
+            function observeForHiddenFields() {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList') {
+                            console.log("DOM change detected. Checking for hidden fields...");
+                            logHiddenFields();
+                        }
+                    });
+                });
 
-                // Optionally, re-fetch values during form submission
-                JFCustomWidget.subscribe('submit', function () {
-                    console.log("Form submission detected. Re-fetching hidden field values...");
-                    fetchAndLogHiddenFields();
+                // Observe the entire document body for changes
+                const config = { childList: true, subtree: true };
+                observer.observe(document.body, config);
+
+                console.log("Started observing DOM changes.");
+            }
+
+            // Always subscribe to the ready event
+            JFCustomWidget.subscribe("ready", function () {
+                console.log("Widget is ready. Fetching hidden fields...");
+                logHiddenFields(); // Attempt to fetch immediately
+
+                // Set up the observer to handle dynamic changes
+                observeForHiddenFields();
+
+                // Handle form submission
+                JFCustomWidget.subscribe("submit", function () {
+                    console.log("Form submission detected. Re-fetching hidden fields...");
+                    logHiddenFields();
 
                     // Send placeholder data to JotForm
                     const msg = {
