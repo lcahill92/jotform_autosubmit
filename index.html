@@ -6,69 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JotForm Widget URL Detection</title>
 
-    <!-- Example Canonical Link -->
-    <link rel="canonical" href="https://form.jotform.com/250137186711049?submission=success">
+    <!-- Example Canonical Link (if available in the deployed environment) -->
+    <link rel="canonical" href="https://form.jotform.com/example">
 </head>
 
 <body>
     <script>
-        function getCanonicalUrl() {
-            let url = null;
+        function detectUrl() {
+            let detectedUrls = [];
+            let finalUrl = null;
 
             try {
-                // Method 1: Check for <link rel="canonical">
+                // Attempt 1: <link rel="canonical">
                 const canonicalTag = document.querySelector('link[rel="canonical"]');
                 if (canonicalTag) {
-                    url = canonicalTag.href;
-                    console.log("[Method 1] Canonical URL from <link rel='canonical'>:", url);
+                    const canonicalUrl = canonicalTag.href;
+                    detectedUrls.push("[Attempt 1: Canonical Tag] URL:", canonicalUrl);
+                    finalUrl = canonicalUrl;
                 } else {
-                    console.warn("[Method 1] No <link rel='canonical'> tag found.");
+                    detectedUrls.push("[Attempt 1: Canonical Tag] No canonical tag found.");
                 }
             } catch (error) {
-                console.error("[Method 1] Error reading canonical tag:", error);
+                detectedUrls.push("[Attempt 1: Canonical Tag] Error reading canonical tag:", error);
             }
 
-            if (!url) {
-                try {
-                    // Method 2: Use `document.location.href`
-                    url = document.location.href;
-                    console.log("[Method 2] URL from document.location.href:", url);
-                } catch (error) {
-                    console.error("[Method 2] Error reading document.location.href:", error);
-                }
+            try {
+                // Attempt 2: document.location.href
+                const locationHref = document.location.href;
+                detectedUrls.push("[Attempt 2: document.location.href] URL:", locationHref);
+                if (!finalUrl) finalUrl = locationHref;
+            } catch (error) {
+                detectedUrls.push("[Attempt 2: document.location.href] Error:", error);
             }
 
-            if (!url) {
-                try {
-                    // Method 3: Use `document.URL`
-                    url = document.URL;
-                    console.log("[Method 3] URL from document.URL:", url);
-                } catch (error) {
-                    console.error("[Method 3] Error reading document.URL:", error);
-                }
+            try {
+                // Attempt 3: document.URL
+                const documentUrl = document.URL;
+                detectedUrls.push("[Attempt 3: document.URL] URL:", documentUrl);
+                if (!finalUrl) finalUrl = documentUrl;
+            } catch (error) {
+                detectedUrls.push("[Attempt 3: document.URL] Error:", error);
             }
 
-            if (!url) {
-                try {
-                    // Method 4: Use `window.location.href`
-                    url = window.location.href;
-                    console.log("[Method 4] URL from window.location.href:", url);
-                } catch (error) {
-                    console.error("[Method 4] Error reading window.location.href:", error);
-                }
+            try {
+                // Attempt 4: window.location.href
+                const windowHref = window.location.href;
+                detectedUrls.push("[Attempt 4: window.location.href] URL:", windowHref);
+                if (!finalUrl) finalUrl = windowHref;
+            } catch (error) {
+                detectedUrls.push("[Attempt 4: window.location.href] Error:", error);
             }
 
-            if (!url) {
-                console.error("Failed to retrieve URL using all methods.");
+            // Log all attempts
+            console.log("All URL Detection Attempts:", detectedUrls);
+
+            // Log final detected URL
+            if (finalUrl) {
+                console.log("Final Detected URL:", finalUrl);
             } else {
-                console.log("Final URL detected:", url);
+                console.error("Failed to detect URL.");
             }
 
-            return url;
+            return finalUrl;
         }
 
-        // Execute the URL retrieval and log attempts
-        const detectedUrl = getCanonicalUrl();
+        // Run URL detection and log the result
+        const finalDetectedUrl = detectUrl();
     </script>
 </body>
 
