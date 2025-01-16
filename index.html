@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Dynamic Form Fields Example</h1>
-    <p>The form fields will be dynamically generated based on the widget settings.</p>
+    <p>The form fields will be dynamically generated based on the `field1` widget setting.</p>
 
     <form id="dynamicForm">
         <!-- Dynamic fields will be appended here -->
@@ -30,17 +30,17 @@
             return null;
         }
 
-        // Function to dynamically create form fields based on widget settings
+        // Function to dynamically create form fields based on `field1` widget setting
         function setupFormFields() {
             const settings = getWidgetSettings();
             const formElement = document.getElementById('dynamicForm');
 
-            if (!settings || !settings.numFields) {
-                console.error('Number of fields not found in widget settings');
+            if (!settings || !settings.field1) {
+                console.error('Field1 value not found in widget settings');
                 return;
             }
 
-            const numFields = parseInt(settings.numFields, 10);
+            const numFields = parseInt(settings.field1, 10);
 
             // Clear any existing fields
             formElement.innerHTML = '';
@@ -118,6 +118,6 @@
     </script>
 
     <!-- Hidden element to simulate widget settings -->
-    <input id="widget_settings" type="hidden" value="%5B%7B%22name%22%3A%22apiKey%22%2C%22value%22%3A%22YOUR_API_KEY_HERE%22%7D%2C%7B%22name%22%3A%22formId%22%2C%22value%22%3A%22YOUR_FORM_ID_HERE%22%7D%2C%7B%22name%22%3A%22numFields%22%2C%22value%22%3A%223%22%7D%5D">
+    <input id="widget_settings" type="hidden" value="%5B%7B%22name%22%3A%22apiKey%22%2C%22value%22%3A%22YOUR_API_KEY_HERE%22%7D%2C%7B%22name%22%3A%22formId%22%2C%22value%22%3A%22YOUR_FORM_ID_HERE%22%7D%2C%7B%22name%22%3A%22field1%22%2C%22value%22%3A%223%22%7D%5D">
 </body>
 </html>
