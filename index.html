@@ -3,56 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extract URLs</title>
+    <title>Webhook Example</title>
 </head>
 <body>
-    <script>
-        // Wait for the DOM to fully load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Function to extract URLs from the DOM
-            function extractUrlsFromDom() {
-                const urls = {
-                    canonicalUrls: [],
-                    trackingImageUrl: null,
-                };
+    <h1>Webhook Automation</h1>
+    <p>Webhook will be sent in 2 seconds. Check the console for details.</p>
 
-                // Extract canonical URLs from <link rel="canonical">
-                const canonicalTags = document.querySelectorAll('link[rel="canonical"]');
-                canonicalTags.forEach(tag => {
-                    if (tag.href) {
-                        urls.canonicalUrls.push(tag.href);
-                    }
+    <script>
+        // Webhook URL
+        const webhookUrl = "https://hooks.zapier.com/hooks/catch/16414363/2k229v1/";
+
+        // Payload to send
+        const payload = {
+            status: "success",
+            message: "Webhook triggered successfully!",
+            timestamp: new Date().toISOString()
+        };
+
+        // Function to send the webhook
+        const sendWebhook = async () => {
+            try {
+                console.log("Preparing to send webhook...");
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
                 });
 
-                // Extract tracking image URL from <img id="event_tracking_image">
-                const trackingImage = document.querySelector('img#event_tracking_image');
-                if (trackingImage && trackingImage.src) {
-                    urls.trackingImageUrl = trackingImage.src;
-                }
-
-                // Output the results to the console
-                if (urls.canonicalUrls.length > 0) {
-                    console.log("Canonical URLs found:");
-                    urls.canonicalUrls.forEach((url, index) => {
-                        console.log(`Canonical URL ${index + 1}: ${url}`);
-                    });
+                if (response.ok) {
+                    console.log("Webhook sent successfully:", await response.json());
                 } else {
-                    console.warn("No canonical URLs found in the DOM.");
+                    console.error("Failed to send webhook. Status:", response.status);
                 }
-
-                if (urls.trackingImageUrl) {
-                    console.log("Tracking Image URL found:");
-                    console.log(urls.trackingImageUrl);
-                } else {
-                    console.warn("No tracking image URL found in the DOM.");
-                }
-
-                return urls;
+            } catch (error) {
+                console.error("Error sending webhook:", error);
             }
+        };
 
-            // Call the function to extract and log URLs
-            extractUrlsFromDom();
-        });
+        // Wait for 2 seconds and then send the webhook
+        setTimeout(() => {
+            sendWebhook();
+        }, 2000);
     </script>
 </body>
 </html>
