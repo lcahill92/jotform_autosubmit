@@ -14,20 +14,37 @@
             <input type="text" id="userInput2" placeholder="Enter second value">
             <br><br>
             <!-- Example hidden field inside the widget -->
-            <input id="input_121" class="form-hidden form-widget" type="hidden" name="q121_typeA" value="test@test.com">
+            <input id="input_122" class="form-hidden form-widget" type="hidden" name="q122_typeA" value="test@test.com">
         </div>
         <script type="text/javascript">
+            // Function to log all input fields in the widget for debugging
+            function logAllInputs() {
+                const inputs = document.querySelectorAll("input");
+                console.log("All input fields in the widget:", inputs);
+            }
+
+            // Function to retry locating the hidden field
+            function waitForField(selector, callback, attempts = 20) {
+                const hiddenField = document.querySelector(selector);
+                if (hiddenField) {
+                    callback(hiddenField);
+                } else if (attempts > 0) {
+                    console.warn(`Hidden field not found. Retrying... (${20 - attempts + 1})`);
+                    setTimeout(() => waitForField(selector, callback, attempts - 1), 200);
+                } else {
+                    console.error(`Hidden field with selector "${selector}" not found after multiple attempts.`);
+                    logAllInputs(); // Log all inputs for debugging
+                }
+            }
+
             // Function to locate and log the value of the hidden input field
             function findAndLogHiddenFieldValue(qid, fieldName) {
                 // Construct the selector dynamically using qid and fieldName
                 const hiddenFieldSelector = `input[name="q${qid}_${fieldName}"]`;
-                const hiddenField = document.querySelector(hiddenFieldSelector);
-
-                if (hiddenField) {
+                console.log(`Looking for hidden field with selector: "${hiddenFieldSelector}"`);
+                waitForField(hiddenFieldSelector, (hiddenField) => {
                     console.log(`Value of the hidden field "q${qid}_${fieldName}":`, hiddenField.value);
-                } else {
-                    console.warn(`Hidden field with name "q${qid}_${fieldName}" not found in the widget.`);
-                }
+                });
             }
 
             // Always subscribe to the ready event
@@ -39,7 +56,6 @@
                 const field1 = settings.field1; // Fetch field name suffix
 
                 if (qid && field1) {
-                    console.log(`Looking for hidden field with name: q${qid}_${field1}`);
                     findAndLogHiddenFieldValue(qid, field1);
                 } else {
                     if (!qid) console.error("QID is not defined in the widget settings.");
@@ -51,7 +67,6 @@
                     const value1 = document.getElementById("userInput1").value;
                     const value2 = document.getElementById("userInput2").value;
 
-                    // Prepare the message to send to JotForm
                     const msg = {
                         valid: true,
                         value: {
