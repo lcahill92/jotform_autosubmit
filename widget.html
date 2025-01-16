@@ -14,15 +14,16 @@
             <input type="text" id="userInput2" placeholder="Enter second value">
         </div>
         <script type="text/javascript">
-            // Function to locate and log the value of the hidden input field by its ID
-            function findAndLogHiddenFieldValueById(fieldId) {
-                // Locate the hidden field using its ID
-                const hiddenField = document.getElementById(fieldId);
+            // Function to locate and log the value of the hidden input field
+            function findAndLogHiddenFieldValue(fieldName) {
+                // Construct the selector dynamically based on the widget setting (field1)
+                const hiddenFieldSelector = `input[id="${fieldName}"]`; // Adjust prefix if necessary
+                const hiddenField = document.querySelector(hiddenFieldSelector);
 
                 if (hiddenField) {
-                    console.log(`Value of the hidden field with ID "${fieldId}":`, hiddenField.value);
+                    console.log(`Value of the hidden field "${fieldName}":`, hiddenField.value);
                 } else {
-                    console.warn(`Hidden field with ID "${fieldId}" not found.`);
+                    console.warn(`Hidden field with name "${hiddenFieldSelector}" not found.`);
                 }
             }
 
@@ -33,11 +34,11 @@
                 console.log("Widget settings:", settings);
 
                 // Fetch the value of field1 from the settings
-                const field1 = settings.Field1;
-                if (Field1) {
-                    console.log(`Looking for hidden field with ID: ${field1}`);
+                const field1 = settings.field1;
+                if (field1) {
+                    console.log(`Looking for hidden field with name derived from: ${field1}`);
                     // Locate and log the value of the hidden input field
-                    findAndLogHiddenFieldValueById(Field1);
+                    findAndLogHiddenFieldValue(field1);
                 } else {
                     console.error("field1 is not defined in the widget settings.");
                 }
