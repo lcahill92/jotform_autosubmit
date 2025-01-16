@@ -10,14 +10,8 @@
             <div id="hidden-values-output"></div>
         </div>
         <script type="text/javascript">
-            // Function to log all elements in the widget for debugging
-            function logAllElements() {
-                console.log("Logging all elements in the iframe:");
-                console.log(document.body.innerHTML);
-            }
-
-            // Function to locate and log hidden field values
-            function fetchHiddenFields() {
+            // Function to log hidden field values
+            function fetchAndLogHiddenFields() {
                 console.log("Attempting to fetch hidden fields...");
                 const wrapper = document.querySelector('.widget-inputs-wrapper');
 
@@ -41,25 +35,44 @@
                 }
             }
 
-            // Function to retry locating hidden fields with a time delay
-            function retryFetchHiddenFields(attempts = 20) {
+            // Function to observe dynamic DOM changes
+            function observeDOMChanges() {
+                const observer = new MutationObserver((mutations) => {
+                    for (const mutation of mutations) {
+                        if (mutation.type === 'childList') {
+                            console.log("DOM mutation detected. Checking for hidden fields...");
+                            fetchAndLogHiddenFields();
+                        }
+                    }
+                });
+
+                // Start observing the body for changes
+                observer.observe(document.body, { childList: true, subtree: true });
+                console.log("Started observing DOM for changes.");
+            }
+
+            // Retry fetching hidden fields multiple times
+            function retryFetchHiddenFields(attempts = 10) {
                 if (attempts === 0) {
                     console.error("Failed to locate hidden fields after multiple attempts.");
-                    logAllElements(); // Log all elements for debugging
+                    console.log("Logging entire DOM for debugging...");
+                    console.log(document.body.innerHTML); // Log full DOM
                     return;
                 }
 
                 setTimeout(() => {
-                    console.log(`Retrying... (${21 - attempts}/20)`);
-                    fetchHiddenFields();
+                    console.log(`Retrying... (${11 - attempts}/10)`);
+                    fetchAndLogHiddenFields();
                     retryFetchHiddenFields(attempts - 1);
-                }, 250); // Retry every 250ms (5-second total retry window)
+                }, 500); // Retry every 500ms
             }
 
-            // Always subscribe to the ready event
+            // Widget initialization
             JFCustomWidget.subscribe("ready", function () {
-                console.log("Widget is ready. Starting hidden field fetch attempts...");
-                retryFetchHiddenFields(); // Start fetching hidden fields dynamically
+                console.log("Widget is ready.");
+                fetchAndLogHiddenFields(); // Initial fetch
+                retryFetchHiddenFields(); // Retry if needed
+                observeDOMChanges(); // Monitor for dynamic changes
             });
         </script>
     </body>
