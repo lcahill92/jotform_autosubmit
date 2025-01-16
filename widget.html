@@ -16,14 +16,24 @@
         <script type="text/javascript">
             // Function to locate and log the value of the hidden input field
             function findAndLogHiddenFieldValue(fieldId) {
-                // Construct the selector dynamically based on the widget setting (field1)
-                const hiddenField = document.getElementById(fieldId);
+                setTimeout(() => {
+                    // Attempt to locate the field using its ID
+                    const hiddenField = document.getElementById(fieldId);
 
-                if (hiddenField) {
-                    console.log(`Value of the hidden field with ID "${fieldId}":`, hiddenField.value);
-                } else {
-                    console.warn(`Hidden field with ID "${fieldId}" not found.`);
-                }
+                    if (hiddenField) {
+                        console.log(`Value of the hidden field with ID "${fieldId}":`, hiddenField.value);
+                    } else {
+                        console.warn(`Hidden field with ID "${fieldId}" not found. Searching with querySelector as a fallback.`);
+                        
+                        // Fallback: Search with querySelector if getElementById fails
+                        const fallbackField = document.querySelector(`input[id="${fieldId}"]`);
+                        if (fallbackField) {
+                            console.log(`(Fallback) Value of the hidden field with ID "${fieldId}":`, fallbackField.value);
+                        } else {
+                            console.error(`Hidden field with ID "${fieldId}" still not found.`);
+                        }
+                    }
+                }, 500); // Delay to ensure the DOM is fully loaded
             }
 
             // Always subscribe to the ready event and implement widget-related code inside the callback function
