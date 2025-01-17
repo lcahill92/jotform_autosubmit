@@ -12,10 +12,10 @@
         "label": "Form ID",
         "description": "The ID of the form to interact with."
       },
-      "inputIds": {
+      "field1": {
         "type": "string",
-        "label": "Input Field IDs",
-        "description": "Comma-separated IDs of the form fields to fetch data from."
+        "label": "Field ID",
+        "description": "The ID of a specific form field to fetch data from."
       }
     }
   }
