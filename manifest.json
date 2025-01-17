@@ -1,0 +1,21 @@
+{
+    "name": "Custom Form Interaction Widget",
+    "description": "A widget that interacts with both its own fields and JotForm form fields.",
+    "icon": "icon.png",
+    "js": "widget.js",
+    "html": "widget.html",
+    "css": "widget.css",
+    "version": "1.0",
+    "properties": {
+      "formId": {
+        "type": "string",
+        "label": "Form ID",
+        "description": "The ID of the form to interact with."
+      },
+      "inputIds": {
+        "type": "string",
+        "label": "Input Field IDs",
+        "description": "Comma-separated IDs of the form fields to fetch data from."
+      }
+    }
+  }
