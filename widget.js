@@ -2,50 +2,50 @@
 JFCustomWidget.subscribe("ready", function () {
     console.log("Widget is ready!");
   
-    // Fetch widget settings
+    // Fetch widget settings defined in the JotForm Widget Builder
     const settings = JFCustomWidget.getWidgetSettings();
     console.log("Widget Settings:", settings);
   
-    const formId = settings.formId; // Form ID from settings
-    const field1 = settings.field1; // Single field ID from settings
+    const fieldId = settings.fieldId; // Get the field ID passed via settings
+    if (!fieldId) {
+      console.error("No Field ID provided in widget settings.");
+      return;
+    }
   
-    console.log("Form ID from settings:", formId);
-    console.log("Field ID from settings:", field1);
+    console.log("Field ID from settings:", fieldId);
   
-    // Fetch value from the hidden field (id="input_152")
-    const hiddenFieldId = "input_152"; // Adjust this as needed
-    JFCustomWidget.getWidgetValue(hiddenFieldId, function (hiddenFieldValue) {
-      if (hiddenFieldValue !== undefined) {
-        console.log(`Value retrieved from hidden field (ID: ${hiddenFieldId}):`, hiddenFieldValue);
+    // Fetch the value of the field from JotForm
+    JFCustomWidget.getFieldValue(fieldId, function (fieldValue) {
+      if (fieldValue !== undefined) {
+        console.log(`Value retrieved from form field (ID: ${fieldId}):`, fieldValue);
+  
+        // Optional: Display the field value in a widget input field
+        const widgetInputElement = document.getElementById("widgetInput");
+        if (widgetInputElement) {
+          widgetInputElement.value = fieldValue;
+          console.log("Widget input pre-filled with field value:", fieldValue);
+        }
       } else {
-        console.warn(`Hidden field with ID ${hiddenFieldId} has no value or does not exist.`);
+        console.warn(`Field with ID ${fieldId} has no value or does not exist.`);
       }
     });
   
-    // Log the widget input field (if exists)
-    const widgetInputElement = document.getElementById("widgetInput");
-    if (widgetInputElement) {
-      console.log("Widget Input Element:", widgetInputElement);
-      console.log("Initial value of widget input:", widgetInputElement.value);
-    } else {
-      console.warn("Widget input field is missing.");
+    // Add event listener for the widget's submit button (if required)
+    const widgetSubmitButton = document.getElementById("widgetSubmit");
+    if (widgetSubmitButton) {
+      widgetSubmitButton.addEventListener("click", function () {
+        const widgetInputValue = document.getElementById("widgetInput").value;
+        console.log("Widget input value:", widgetInputValue);
+  
+        // Send the widget data back to JotForm
+        const payload = { fieldId, widgetInputValue };
+        console.log("Payload to be sent:", payload);
+        JFCustomWidget.sendSubmit(payload);
+      });
     }
-  
-    // Capture the current state of all key settings and fields
-    const state = {
-      formId: formId,
-      field1: field1,
-      hiddenFieldValue: null,
-    };
-  
-    // Update state with hidden field value
-    JFCustomWidget.getWidgetValue(hiddenFieldId, function (value) {
-      state.hiddenFieldValue = value;
-      console.log("Captured state on load:", state);
-    });
   });
   
-  // Listen for form submission (optional if needed later)
+  // Log form submission (optional)
   JFCustomWidget.subscribe("submit", function () {
     console.log("Form submission triggered.");
   });
