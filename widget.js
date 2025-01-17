@@ -13,7 +13,7 @@ JFCustomWidget.subscribe("ready", function () {
     console.log("Field ID from settings:", field1);
   
     // Add event listener to handle widget input submission
-    const widgetInputElement = document.getElementById("widgetInput");
+    const widgetInputElement = document.getElementById("field1");
     const widgetSubmitButton = document.getElementById("widgetSubmit");
   
     if (!widgetInputElement || !widgetSubmitButton) {
