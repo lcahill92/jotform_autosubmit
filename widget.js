@@ -3,7 +3,7 @@ JFCustomWidget.subscribe("ready", function () {
     console.log("Widget is ready!");
   
     // Fetch widget settings
-    const settings = JFCustomWidget.getSettings();
+    const settings = JFCustomWidget.getWidgetSettings();
     console.log("Widget Settings:", settings);
   
     const formId = settings.formId; // Form ID from settings
