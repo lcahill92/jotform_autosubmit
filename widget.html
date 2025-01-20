@@ -13,6 +13,31 @@
         <script type="text/javascript">
             console.log("Widget is initializing...");
 
+            // Your Zapier webhook URL
+            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/"; // Replace with your webhook URL
+
+            // Function to send data to Zapier webhook
+            async function sendToZapierWebhook(data) {
+                try {
+                    const response = await fetch(zapierWebhookUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.status}`);
+                    }
+
+                    const responseData = await response.json();
+                    console.log("Data successfully sent to Zapier:", responseData);
+                } catch (error) {
+                    console.error("Failed to send data to Zapier:", error);
+                }
+            }
+
             // Subscribe to widget ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
@@ -22,18 +47,33 @@
                 document.getElementById('labelText').innerText = settings || "Default Label";
             });
 
-            // Listen for all messages but extract only "widgetpopulate"
+            // Listen for all messages but emphasize "widgetpopulate"
             window.addEventListener("message", function (event) {
                 const message = event.data;
 
                 // Check if the message is of type "widgetpopulate"
                 if (message && message.type === "widgetpopulate") {
-                    // Extract and log only the relevant portion
-                    const relevantData = {
+                    console.log("%c[WIDGETPOPULATE] Message received:", "color: green; font-weight: bold;", message);
+                    console.log("%cValue:", "color: blue; font-style: italic;", message.value);
+
+                    // Optionally populate the input field with the value
+                    document.getElementById('userInput').value = message.value || "";
+
+                    // Prepare data to send to Zapier
+                    const data = {
                         type: message.type,
-                        qid: message.qid
+                        qid: message.qid,
+                        value: message.value,
+                        timestamp: new Date().toISOString()
                     };
-                    console.log("%c[WIDGETPOPULATE] Relevant data:", "color: green; font-weight: bold;", relevantData);
+
+                    console.log("Sending data to Zapier:", data);
+
+                    // Send data to Zapier webhook
+                    sendToZapierWebhook(data);
+                } else {
+                    // Log all other messages in a subdued manner
+                    console.log("[INFO] Other message received:", message);
                 }
             });
         </script>
