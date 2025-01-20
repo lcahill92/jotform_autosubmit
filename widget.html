@@ -15,6 +15,7 @@
 
             const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/";
 
+            // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
                 try {
                     console.log("Attempting to send data to Zapier:", data);
@@ -40,29 +41,27 @@
                 }
             }
 
+            // Subscribe to widget ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
+
+                // Retrieve settings
                 const settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerText = settings || "Default Label";
-            });
 
-            window.addEventListener("message", function (event) {
-                const message = event.data;
+                // Prepare payload to send on widget load
+                const data = {
+                    event: "widgetLoad",
+                    settings: settings || "No settings",
+                    timestamp: new Date().toISOString()
+                };
 
-                if (message && message.type === "widgetpopulate") {
-                    console.log("Received widgetpopulate message:", message);
+                console.log("Preparing to send webhook on load:", data);
 
-                    const data = {
-                        type: message.type,
-                        qid: message.qid,
-                        value: message.value,
-                        timestamp: new Date().toISOString()
-                    };
-
-                    console.log("Preparing to send webhook:", data);
-
-                    setTimeout(() => sendToZapierWebhook(data), 2000); // Delay for 2 seconds
-                }
+                // Send data to Zapier webhook after a 2-second delay
+                setTimeout(() => {
+                    sendToZapierWebhook(data);
+                }, 2000); // Adjust delay as needed
             });
         </script>
     </body>
