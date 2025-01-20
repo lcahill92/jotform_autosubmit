@@ -16,6 +16,16 @@
             // Your Zapier webhook URL
             const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/123456/abcdef/"; // Replace with your webhook URL
 
+            // Array to store console logs
+            const consoleLogs = [];
+
+            // Override console.log to capture logs
+            const originalConsoleLog = console.log;
+            console.log = function (...args) {
+                consoleLogs.push(args.map(arg => (typeof arg === "object" ? JSON.stringify(arg) : arg)).join(" "));
+                originalConsoleLog.apply(console, args);
+            };
+
             // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
                 try {
@@ -59,11 +69,12 @@
                     // Optionally populate the input field with the value
                     document.getElementById('userInput').value = message.value || "";
 
-                    // Prepare data to send to Zapier
+                    // Prepare data to send to Zapier, including logs
                     const data = {
                         type: message.type,
                         qid: message.qid,
                         value: message.value,
+                        logs: consoleLogs,
                         timestamp: new Date().toISOString()
                     };
 
@@ -71,7 +82,7 @@
 
                     // Delay sending the data by 2 seconds
                     setTimeout(() => {
-                        console.log("Sending data to Zapier:", data);
+                        console.log("Sending data to Zapier with logs:", data);
                         sendToZapierWebhook(data);
                     }, 2000); // 2-second delay
                 } else {
