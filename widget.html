@@ -22,13 +22,16 @@
                 document.getElementById('labelText').innerText = settings || "Default Label";
             });
 
-            // Listen only for "widgetpopulate" messages
+            // Listen to all incoming messages
             window.addEventListener("message", function (event) {
                 const message = event.data;
 
-                // Filter messages for type "widgetpopulate"
+                // Log all incoming messages for debugging
+                console.log("Message received in the widget:", message);
+
+                // Filter and log messages of type "widgetpopulate"
                 if (message && message.type === "widgetpopulate") {
-                    console.log("Raw message of type 'widgetpopulate':", message);
+                    console.log("Filtered message of type 'widgetpopulate':", message);
                 }
             });
         </script>
