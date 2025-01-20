@@ -19,6 +19,9 @@
             // Track the latest value
             let latestValue = null;
 
+            // Detect if the widget is in edit mode
+            let isEditMode = false;
+
             // Override console.log to capture and filter logs
             const originalConsoleLog = console.log;
             console.log = function (...args) {
@@ -74,6 +77,15 @@
             // Subscribe to widget ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
+
+                // Check if the widget is in edit mode
+                const settings = JFCustomWidget.getWidgetSetting('isEditMode');
+                isEditMode = settings || false;
+
+                if (isEditMode) {
+                    console.log("Widget is in edit mode. Skipping webhook call.");
+                    return; // Exit if in edit mode
+                }
 
                 // Send webhook with only the latest value
                 setTimeout(() => {
