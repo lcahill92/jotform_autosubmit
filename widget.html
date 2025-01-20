@@ -22,7 +22,7 @@
                 document.getElementById('labelText').innerText = settings || "Default Label";
             });
 
-            // Listen for messages and log only "widgetpopulate"
+            // Listen for all messages but emphasize "widgetpopulate"
             window.addEventListener("message", function (event) {
                 const message = event.data;
 
@@ -33,6 +33,9 @@
 
                     // Optionally populate the input field with the value
                     document.getElementById('userInput').value = message.value || "";
+                } else {
+                    // Log all other messages in a subdued manner
+                    console.log("[INFO] Other message received:", message);
                 }
             });
         </script>
