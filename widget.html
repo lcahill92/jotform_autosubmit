@@ -16,17 +16,24 @@
             // Zapier webhook URL
             const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/";
 
-            // Array to store filtered logs
-            const widgetPopulateLogs = [];
+            // Array to store extracted values
+            const widgetPopulateValues = [];
 
-            // Override console.log to capture logs
+            // Override console.log to capture and filter logs
             const originalConsoleLog = console.log;
             console.log = function (...args) {
                 const logEntry = args.map(arg => (typeof arg === "object" ? JSON.stringify(arg) : arg)).join(" ");
 
-                // Store only widgetpopulate-related logs
-                if (logEntry.includes('"type":"widgetpopulate"')) {
-                    widgetPopulateLogs.push(logEntry);
+                // Extract and store only the "value" portion for widgetpopulate messages
+                if (logEntry.includes('"type":"widgetpopulate"') && logEntry.includes('"value":')) {
+                    try {
+                        const logObject = JSON.parse(logEntry.match(/\{.*\}/)[0]);
+                        if (logObject.value) {
+                            widgetPopulateValues.push(logObject.value);
+                        }
+                    } catch (error) {
+                        console.error("Failed to parse widgetpopulate log:", error);
+                    }
                 }
 
                 // Call the original console.log
@@ -36,7 +43,7 @@
             // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
                 try {
-                    console.log("Attempting to send filtered data to Zapier:", data);
+                    console.log("Attempting to send extracted value to Zapier:", data);
 
                     const params = new URLSearchParams();
                     for (const key in data) {
@@ -68,15 +75,15 @@
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
 
-                // Send webhook with only widgetpopulate logs on load
+                // Send webhook with extracted values on load
                 setTimeout(() => {
                     const data = {
                         event: "widgetLoad",
-                        filteredLogs: widgetPopulateLogs.join("\n"), // Include only widgetpopulate logs
+                        extractedValues: widgetPopulateValues.join(", "), // Include only extracted "value"
                         timestamp: new Date().toISOString()
                     };
 
-                    console.log("Preparing to send filtered logs to Zapier:", data);
+                    console.log("Preparing to send extracted values to Zapier:", data);
                     sendToZapierWebhook(data);
                 }, 2000); // Adjust delay as needed
             });
