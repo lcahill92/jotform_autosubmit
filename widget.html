@@ -5,60 +5,35 @@
     </head>
     <body>
         <div id="main">
-            <h3>Custom Widget with Debugging</h3>
+            <h3>Custom Widget</h3>
             <span id="labelText"></span>
             <input type="text" id="userInput" placeholder="Enter some data">
-            <button id="updateButton">Update</button>
         </div>
 
         <script type="text/javascript">
-            console.log("Widget is loading...");
+            console.log("Widget is initializing...");
 
-            // Log all incoming settings from JotForm
+            // Subscribe to widget ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
 
-                // Retrieve widget settings
-                var settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
-                console.log("Retrieved widget settings:", settings);
-
-                // Update UI with the label from settings
+                // Retrieve settings
+                const settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerText = settings || "Default Label";
-                console.log("Label updated to:", settings || "Default Label");
-
-                // Subscribe to form submission
-                JFCustomWidget.subscribe("submit", function () {
-                    var inputValue = document.getElementById('userInput').value;
-                    console.log("Submit event triggered. User input value:", inputValue);
-
-                    // Send data back to the form
-                    var msg = {
-                        valid: inputValue.trim() !== "",
-                        value: inputValue
-                    };
-                    console.log("Message being sent to JotForm on submit:", msg);
-
-                    JFCustomWidget.sendSubmit(msg);
-                });
+                console.log("Label set to:", settings || "Default Label");
             });
 
-            // Real-time updates when the button is clicked
-            document.getElementById('updateButton').addEventListener('click', function () {
-                var inputValue = document.getElementById('userInput').value;
-                console.log("Update button clicked. Current input value:", inputValue);
-
-                // Send data back to the form in real-time
-                JFCustomWidget.sendData({
-                    value: inputValue
-                });
-
-                console.log("Real-time data sent to JotForm:", inputValue);
-            });
-
-            // Optional: Log unhandled events
+            // Listen for specific messages (e.g., widgetpopulate)
             window.addEventListener("message", function (event) {
-                console.log("Message received in the widget:", event.data);
+                const message = event.data;
+
+                if (message && message.type === "widgetpopulate") {
+                    console.log("Message received in the widget:", message);
+                    console.log("Value:", message.value); // Log the value specifically
+                }
             });
+
+            // Optional: Other widget features can be added here
         </script>
     </body>
 </html>
