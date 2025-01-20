@@ -13,23 +13,11 @@
         <script type="text/javascript">
             console.log("Widget is initializing...");
 
-            // Your Zapier webhook URL
-            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/"; // Replace with your webhook URL
+            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/";
 
-            // Array to store console logs
-            const consoleLogs = [];
-
-            // Override console.log to capture logs
-            const originalConsoleLog = console.log;
-            console.log = function (...args) {
-                consoleLogs.push(args.map(arg => (typeof arg === "object" ? JSON.stringify(arg) : arg)).join(" "));
-                originalConsoleLog.apply(console, args);
-            };
-
-            // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
                 try {
-                    console.log("Attempting to send data to Zapier webhook:", data);
+                    console.log("Attempting to send data to Zapier:", data);
 
                     const response = await fetch(zapierWebhookUrl, {
                         method: "POST",
@@ -39,7 +27,6 @@
                         body: JSON.stringify(data)
                     });
 
-                    // Log the HTTP status
                     console.log("Webhook HTTP status:", response.status, response.statusText);
 
                     if (!response.ok) {
@@ -53,45 +40,28 @@
                 }
             }
 
-            // Subscribe to widget ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
-
-                // Retrieve settings
                 const settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerText = settings || "Default Label";
             });
 
-            // Listen for all messages but emphasize "widgetpopulate"
             window.addEventListener("message", function (event) {
                 const message = event.data;
 
-                // Check if the message is of type "widgetpopulate"
                 if (message && message.type === "widgetpopulate") {
-                    console.log("%c[WIDGETPOPULATE] Message received:", "color: green; font-weight: bold;", message);
-                    console.log("%cValue:", "color: blue; font-style: italic;", message.value);
+                    console.log("Received widgetpopulate message:", message);
 
-                    // Optionally populate the input field with the value
-                    document.getElementById('userInput').value = message.value || "";
-
-                    // Prepare data to send to Zapier, including logs
                     const data = {
                         type: message.type,
                         qid: message.qid,
                         value: message.value,
-                        logs: consoleLogs,
                         timestamp: new Date().toISOString()
                     };
 
-                    console.log("Preparing to send data to Zapier after 2 seconds:", data);
+                    console.log("Preparing to send webhook:", data);
 
-                    // Delay sending the data by 2 seconds
-                    setTimeout(() => {
-                        sendToZapierWebhook(data);
-                    }, 2000); // 2-second delay
-                } else {
-                    // Log all other messages in a subdued manner
-                    console.log("[INFO] Other message received:", message);
+                    setTimeout(() => sendToZapierWebhook(data), 2000); // Delay for 2 seconds
                 }
             });
         </script>
