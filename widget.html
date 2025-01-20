@@ -8,7 +8,6 @@
             <h3>Custom Widget</h3>
             <span id="labelText"></span>
             <input type="text" id="userInput" placeholder="Enter some data">
-            <button id="updateButton">Update</button>
         </div>
 
         <script type="text/javascript">
@@ -21,45 +20,16 @@
                 // Retrieve settings
                 const settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerText = settings || "Default Label";
-                console.log("Label set to:", settings || "Default Label");
             });
 
-            // Listen for all messages but focus on key ones
+            // Listen only for "widgetpopulate" messages
             window.addEventListener("message", function (event) {
                 const message = event.data;
 
-                // Log all messages for context
-                console.log("Raw message received:", message);
-
+                // Filter messages for type "widgetpopulate"
                 if (message && message.type === "widgetpopulate") {
-                    console.log("Filtered widgetpopulate message:", message);
-                    console.log("Value:", message.value); // Log the value specifically
+                    console.log("Raw message of type 'widgetpopulate':", message);
                 }
-            });
-
-            // Handle form submit
-            JFCustomWidget.subscribe("submit", function () {
-                const inputValue = document.getElementById('userInput').value;
-                console.log("Submit event triggered. User input value:", inputValue);
-
-                const msg = {
-                    valid: inputValue.trim() !== "", // Validate the input
-                    value: inputValue
-                };
-                console.log("Message being sent to JotForm on submit:", msg);
-                JFCustomWidget.sendSubmit(msg);
-            });
-
-            // Real-time updates on button click
-            document.getElementById('updateButton').addEventListener("click", function () {
-                const inputValue = document.getElementById('userInput').value;
-                console.log("Update button clicked. Current input value:", inputValue);
-
-                // Send data back to the form in real-time
-                JFCustomWidget.sendData({
-                    value: inputValue
-                });
-                console.log("Real-time data sent to JotForm:", inputValue);
             });
         </script>
     </body>
