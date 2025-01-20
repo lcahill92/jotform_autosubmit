@@ -16,8 +16,8 @@
             // Zapier webhook URL
             const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/";
 
-            // Array to store extracted values
-            const widgetPopulateValues = [];
+            // Set to store unique values
+            const widgetPopulateValues = new Set();
 
             // Override console.log to capture and filter logs
             const originalConsoleLog = console.log;
@@ -29,7 +29,7 @@
                     try {
                         const logObject = JSON.parse(logEntry.match(/\{.*\}/)[0]);
                         if (logObject.value) {
-                            widgetPopulateValues.push(logObject.value);
+                            widgetPopulateValues.add(logObject.value); // Ensure unique values only
                         }
                     } catch (error) {
                         console.error("Failed to parse widgetpopulate log:", error);
@@ -79,7 +79,7 @@
                 setTimeout(() => {
                     const data = {
                         event: "widgetLoad",
-                        extractedValues: widgetPopulateValues.join(", "), // Include only extracted "value"
+                        extractedValues: Array.from(widgetPopulateValues).join(", "), // Convert Set to Array
                         timestamp: new Date().toISOString()
                     };
 
