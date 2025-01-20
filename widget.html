@@ -5,42 +5,59 @@
     </head>
     <body>
         <div id="main">
-            <h3>Custom Widget</h3>
+            <h3>Custom Widget with Debugging</h3>
             <span id="labelText"></span>
             <input type="text" id="userInput" placeholder="Enter some data">
             <button id="updateButton">Update</button>
         </div>
 
         <script type="text/javascript">
-            // Wait for the widget to be ready
-            JFCustomWidget.subscribe("ready", function () {
-                // Get settings provided in the widget setup
-                var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
-                document.getElementById('labelText').innerText = label || "Default Label";
+            console.log("Widget is loading...");
 
-                // Subscribe to form submission event
+            // Log all incoming settings from JotForm
+            JFCustomWidget.subscribe("ready", function () {
+                console.log("Widget is ready!");
+
+                // Retrieve widget settings
+                var settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
+                console.log("Retrieved widget settings:", settings);
+
+                // Update UI with the label from settings
+                document.getElementById('labelText').innerText = settings || "Default Label";
+                console.log("Label updated to:", settings || "Default Label");
+
+                // Subscribe to form submission
                 JFCustomWidget.subscribe("submit", function () {
                     var inputValue = document.getElementById('userInput').value;
+                    console.log("Submit event triggered. User input value:", inputValue);
 
-                    // Create the message object to send back to JotForm
+                    // Send data back to the form
                     var msg = {
-                        valid: inputValue.trim() !== "", // Validation check
+                        valid: inputValue.trim() !== "",
                         value: inputValue
                     };
+                    console.log("Message being sent to JotForm on submit:", msg);
 
-                    // Send data to JotForm
                     JFCustomWidget.sendSubmit(msg);
                 });
             });
 
-            // Add button click event for real-time updates
+            // Real-time updates when the button is clicked
             document.getElementById('updateButton').addEventListener('click', function () {
                 var inputValue = document.getElementById('userInput').value;
+                console.log("Update button clicked. Current input value:", inputValue);
 
-                // Real-time value update back to JotForm
+                // Send data back to the form in real-time
                 JFCustomWidget.sendData({
                     value: inputValue
                 });
+
+                console.log("Real-time data sent to JotForm:", inputValue);
+            });
+
+            // Optional: Log unhandled events
+            window.addEventListener("message", function (event) {
+                console.log("Message received in the widget:", event.data);
             });
         </script>
     </body>
