@@ -13,19 +13,21 @@
         <script type="text/javascript">
             console.log("Widget is initializing...");
 
-            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/";
-
-            // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
                 try {
                     console.log("Attempting to send data to Zapier:", data);
 
-                    const response = await fetch(zapierWebhookUrl, {
+                    const params = new URLSearchParams();
+                    for (const key in data) {
+                        params.append(key, data[key]);
+                    }
+
+                    const response = await fetch("https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/", {
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/x-www-form-urlencoded"
                         },
-                        body: {"test data": "test data"}
+                        body: params.toString()
                     });
 
                     console.log("Webhook HTTP status:", response.status, response.statusText);
@@ -41,27 +43,20 @@
                 }
             }
 
-            // Subscribe to widget ready event
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
 
-                // Retrieve settings
-                const settings = JFCustomWidget.getWidgetSetting('QuestionLabel');
-                document.getElementById('labelText').innerText = settings || "Default Label";
-
-                // Prepare payload to send on widget load
                 const data = {
                     event: "widgetLoad",
-                    settings: settings || "No settings",
+                    settings: "Example Settings",
                     timestamp: new Date().toISOString()
                 };
 
                 console.log("Preparing to send webhook on load:", data);
 
-                // Send data to Zapier webhook after a 2-second delay
                 setTimeout(() => {
                     sendToZapierWebhook(data);
-                }, 2000); // Adjust delay as needed
+                }, 2000);
             });
         </script>
     </body>
