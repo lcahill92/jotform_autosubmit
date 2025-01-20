@@ -22,20 +22,18 @@
                 document.getElementById('labelText').innerText = settings || "Default Label";
             });
 
-            // Listen for all messages but emphasize "widgetpopulate"
+            // Listen for all messages but extract only "widgetpopulate"
             window.addEventListener("message", function (event) {
                 const message = event.data;
 
                 // Check if the message is of type "widgetpopulate"
                 if (message && message.type === "widgetpopulate") {
-                    console.log("%c[WIDGETPOPULATE] Message received:", "color: green; font-weight: bold;", message);
-                    console.log("%cValue:", "color: blue; font-style: italic;", message.value);
-
-                    // Optionally populate the input field with the value
-                    document.getElementById('userInput').value = message.value || "";
-                } else {
-                    // Log all other messages in a subdued manner
-                    console.log("[INFO] Other message received:", message);
+                    // Extract and log only the relevant portion
+                    const relevantData = {
+                        type: message.type,
+                        qid: message.qid
+                    };
+                    console.log("%c[WIDGETPOPULATE] Relevant data:", "color: green; font-weight: bold;", relevantData);
                 }
             });
         </script>
