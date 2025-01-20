@@ -16,8 +16,8 @@
             // Zapier webhook URL
             const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/";
 
-            // Set to store unique values
-            const widgetPopulateValues = new Set();
+            // Track the latest value
+            let latestValue = null;
 
             // Override console.log to capture and filter logs
             const originalConsoleLog = console.log;
@@ -29,7 +29,7 @@
                     try {
                         const logObject = JSON.parse(logEntry.match(/\{.*\}/)[0]);
                         if (logObject.value) {
-                            widgetPopulateValues.add(logObject.value); // Ensure unique values only
+                            latestValue = logObject.value; // Track the latest value
                         }
                     } catch (error) {
                         console.error("Failed to parse widgetpopulate log:", error);
@@ -75,15 +75,15 @@
             JFCustomWidget.subscribe("ready", function () {
                 console.log("Widget is ready!");
 
-                // Send webhook with extracted values on load
+                // Send webhook with only the latest value
                 setTimeout(() => {
                     const data = {
                         event: "widgetLoad",
-                        extractedValues: Array.from(widgetPopulateValues).join(", "), // Convert Set to Array
+                        extractedValue: latestValue || "No value captured", // Send only the latest value
                         timestamp: new Date().toISOString()
                     };
 
-                    console.log("Preparing to send extracted values to Zapier:", data);
+                    console.log("Preparing to send the latest value to Zapier:", data);
                     sendToZapierWebhook(data);
                 }, 2000); // Adjust delay as needed
             });
