@@ -1,13 +1,47 @@
-<div>
-    <h3>Custom Widget</h3>
-    <label for="widgetInput">Widget Input:</label>
-    <input type="text" id="widgetInput" placeholder="Enter data">
-    <button id="widgetSubmit">Submit</button>
-  </div>
-  
-  <!-- Load the JotForm Widget SDK -->
-  <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+    </head>
+    <body>
+        <div id="main">
+            <h3>Custom Widget</h3>
+            <span id="labelText"></span>
+            <input type="text" id="userInput" placeholder="Enter some data">
+            <button id="updateButton">Update</button>
+        </div>
 
-  
-  <!-- Link the custom JavaScript file -->
-  <script src="widget.js"></script>
+        <script type="text/javascript">
+            // Wait for the widget to be ready
+            JFCustomWidget.subscribe("ready", function () {
+                // Get settings provided in the widget setup
+                var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
+                document.getElementById('labelText').innerText = label || "Default Label";
+
+                // Subscribe to form submission event
+                JFCustomWidget.subscribe("submit", function () {
+                    var inputValue = document.getElementById('userInput').value;
+
+                    // Create the message object to send back to JotForm
+                    var msg = {
+                        valid: inputValue.trim() !== "", // Validation check
+                        value: inputValue
+                    };
+
+                    // Send data to JotForm
+                    JFCustomWidget.sendSubmit(msg);
+                });
+            });
+
+            // Add button click event for real-time updates
+            document.getElementById('updateButton').addEventListener('click', function () {
+                var inputValue = document.getElementById('userInput').value;
+
+                // Real-time value update back to JotForm
+                JFCustomWidget.sendData({
+                    value: inputValue
+                });
+            });
+        </script>
+    </body>
+</html>
