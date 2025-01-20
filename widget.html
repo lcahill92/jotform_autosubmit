@@ -14,7 +14,7 @@
             console.log("Widget is initializing...");
 
             // Your Zapier webhook URL
-            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/15522110/2k43c1s/"; // Replace with your webhook URL
+            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/your_webhook_id/"; // Replace with your webhook URL
 
             // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
@@ -67,10 +67,13 @@
                         timestamp: new Date().toISOString()
                     };
 
-                    console.log("Sending data to Zapier:", data);
+                    console.log("Preparing to send data to Zapier after 2 seconds:", data);
 
-                    // Send data to Zapier webhook
-                    sendToZapierWebhook(data);
+                    // Delay sending the data by 2 seconds
+                    setTimeout(() => {
+                        console.log("Sending data to Zapier:", data);
+                        sendToZapierWebhook(data);
+                    }, 2000); // 2-second delay
                 } else {
                     // Log all other messages in a subdued manner
                     console.log("[INFO] Other message received:", message);
