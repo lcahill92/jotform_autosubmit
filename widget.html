@@ -29,7 +29,8 @@
             // Function to send data to Zapier webhook
             async function sendToZapierWebhook(data) {
                 try {
-                    console.log("Sending data to Zapier webhook...");
+                    console.log("Attempting to send data to Zapier webhook:", data);
+
                     const response = await fetch(zapierWebhookUrl, {
                         method: "POST",
                         headers: {
@@ -38,12 +39,15 @@
                         body: JSON.stringify(data)
                     });
 
+                    // Log the HTTP status
+                    console.log("Webhook HTTP status:", response.status, response.statusText);
+
                     if (!response.ok) {
                         throw new Error(`Webhook error: ${response.status} - ${response.statusText}`);
                     }
 
                     const responseData = await response.json();
-                    console.log("Webhook success response:", responseData);
+                    console.log("Webhook success response body:", responseData);
                 } catch (error) {
                     console.error("Failed to send data to Zapier:", error);
                 }
